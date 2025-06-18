@@ -7,7 +7,7 @@ import 'main.dart'; // Assuming DriveEntry is in main.dart
 
 class DatabaseHelper {
   static const _databaseName = "DriveScheduleApp.db";
-  static const _databaseVersion = 2; // Incremented version
+  static const _databaseVersion = 3; // Incremented version for 'type' column
 
   static const tableDriveEntries = 'drive_entries';
 
@@ -16,6 +16,7 @@ class DatabaseHelper {
   static const columnDateTime = 'dateTime'; // Store as TEXT (ISO8601)
   static const columnSource = 'source';
   static const columnDestination = 'destination';
+  static const columnType = 'type'; // New column for 'trip' or 'ticket'
 
   // Make this a singleton class
   DatabaseHelper._privateConstructor();
@@ -33,8 +34,12 @@ class DatabaseHelper {
   Future<Database> _initDatabase() async {
     Directory documentsDirectory = await getApplicationDocumentsDirectory();
     String path = join(documentsDirectory.path, _databaseName);
-    return await openDatabase(path,
-        version: _databaseVersion, onCreate: _onCreate);
+    return await openDatabase(
+      path,
+      version: _databaseVersion,
+      onCreate: _onCreate,
+      onUpgrade: _onUpgrade, // Add onUpgrade
+    );
   }
 
   // SQL code to create the database table
@@ -45,12 +50,23 @@ class DatabaseHelper {
             $columnCustomerName TEXT NOT NULL,
             $columnDateTime TEXT NOT NULL,
             $columnSource TEXT NOT NULL,
-            $columnDestination TEXT NOT NULL
+            $columnDestination TEXT NOT NULL,
+            $columnType TEXT NOT NULL DEFAULT 'trip' -- Add type column with default
           )
           ''');
   }
 
+  // SQL code to upgrade the database table
+  Future _onUpgrade(Database db, int oldVersion, int newVersion) async {
+    if (oldVersion < 3) {
+      // Add the 'type' column if upgrading from a version before 3
+      await db.execute('ALTER TABLE $tableDriveEntries ADD COLUMN $columnType TEXT NOT NULL DEFAULT \'trip\'');
+    }
+    // Add other upgrade paths here if needed for future versions
+  }
+
   // Inserts a row in the database. The return value is the id of the inserted row.
+  // The type is included in entry.toMap()
   Future<int> insertDriveEntry(DriveEntry entry) async {
     Database db = await instance.database;
     return await db.insert(tableDriveEntries, entry.toMap());
@@ -60,7 +76,29 @@ class DatabaseHelper {
   Future<List<DriveEntry>> getAllDriveEntries() async {
     Database db = await instance.database;
     // Query the table for all The Entries.
-    final List<Map<String, dynamic>> maps = await db.query(tableDriveEntries, orderBy: "$columnId DESC");
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableDriveEntries,
+      orderBy: "$columnId DESC",
+    );
+
+    // Convert the List<Map<String, dynamic>> into a List<DriveEntry>.
+    if (maps.isEmpty) {
+      return [];
+    }
+    return List.generate(maps.length, (i) {
+      return DriveEntry.fromMap(maps[i]);
+    });
+  }
+
+  // Retrieves entries of a specific type
+  Future<List<DriveEntry>> getDriveEntriesByType(String type) async {
+    Database db = await instance.database;
+    final List<Map<String, dynamic>> maps = await db.query(
+      tableDriveEntries,
+      where: '$columnType = ?',
+      whereArgs: [type],
+      orderBy: "$columnId DESC",
+    );
 
     // Convert the List<Map<String, dynamic>> into a List<DriveEntry>.
     if (maps.isEmpty) {

@@ -1,3 +1,17 @@
+buildscript {
+    val kotlin_version by extra("1.9.23") // You can update this to your desired Kotlin version
+    repositories {
+        google()
+        mavenCentral()
+    }
+    dependencies {
+        // The Android Gradle Plugin version is managed by the Flutter Gradle Plugin.
+        // If you need to override this, see: https://docs.flutter.dev/deployment/android#managing-the-android-gradle-plugin-version
+        // classpath("com.android.tools.build:gradle:...")
+        classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${property("kotlin_version")}")
+    }
+}
+
 allprojects {
     repositories {
         google()
