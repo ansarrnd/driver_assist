@@ -7,6 +7,8 @@ import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:liquid_glass_ui/liquid_glass_ui.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'tickets_screen.dart'; // Import the new TicketsScreen
 import 'theme.dart';
 
@@ -64,7 +66,7 @@ class NotificationService {
     }
     final int notificationId = int.tryParse(entry.id!) ?? entry.hashCode;
     final tz.TZDateTime scheduledTime =
-        tz.TZDateTime.from(entry.dateTime.subtract(const Duration(hours: 1)), tz.local);
+        tz.TZDateTime.from(entry.dateTime.subtract(const Duration(days: 1)), tz.local);
 
     if (scheduledTime.isBefore(tz.TZDateTime.now(tz.local))) {
       print('Notification time for entry ${entry.id} is in the past. Not scheduling.');
@@ -86,7 +88,7 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.zonedSchedule(
       notificationId,
       'Upcoming Drive Reminder',
-      'Drive for ${entry.customerName} on ${entry.dateTime.toLocal().toString().substring(0, 10)} at ${entry.dateTime.toLocal().toString().substring(11, 16)}. From: ${entry.source} to ${entry.destination}. (In 1 hour)',
+      'Drive for ${entry.customerName} on ${entry.dateTime.toLocal().toString().substring(0, 10)} at ${entry.dateTime.toLocal().toString().substring(11, 16)}. Pickup: ${entry.source} to Drop: ${entry.destination}. (Tomorrow)',
       scheduledTime,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -152,7 +154,7 @@ Future<void> main() async {
   try {
     final List<DriveEntry> allEntries = await DatabaseHelper.instance.getAllDriveEntries();
     for (final DriveEntry entry in allEntries) {
-      // 1. Schedule 1-hour pre-notification using flutter_local_notifications
+      // 1. Schedule 1-day pre-notification using flutter_local_notifications
       await notificationService.scheduleDriveNotification(entry);
 
       // 2. Schedule AndroidAlarmManager for the actual drive time for lapsed handling
@@ -276,7 +278,7 @@ void myCallback(int alarmId) async { // Renamed id to alarmId and made async
     await flutterLocalNotificationsPlugin.show(
       originalEntryId, // Use original entry ID for this specific notification
       'Drive Time Reached: ${entry.customerName}',
-      'Drive for ${entry.customerName} from ${entry.source} to ${entry.destination} was scheduled for ${entry.dateTime.toLocal().toString().substring(11, 16)}.',
+      'Drive for ${entry.customerName} from Pickup: ${entry.source} to Drop: ${entry.destination} was scheduled for ${entry.dateTime.toLocal().toString().substring(11, 16)}.',
       lapsedNotificationDetails,
       payload: 'lapsed_drive_${entry.id}',
     );
@@ -393,6 +395,7 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
 
 
   void _onItemTapped(int index) {
+    HapticFeedback.lightImpact();
     setState(() {
       _selectedIndex = index;
     });
@@ -591,10 +594,17 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'No drive schedules available.',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.directions_car_outlined, size: 64, color: Colors.white.withOpacity(0.5)),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No drive schedules available.',
+                        style: TextStyle(fontSize: 18, color: Colors.white.withOpacity(0.7)),
+                      ),
+                    ],
                   ),
                 );
               } else {
@@ -609,18 +619,26 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
                       child: Text(
                         'No drive schedules found for "$_selectedFilter".',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 18, color: Colors.grey),
+                        style: TextStyle(fontSize: 18, color: Colors.white.withOpacity(0.7)),
                       ),
                     )
                   );
                 }
-                return ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
-                  itemCount: displayedEntries.length,
-                  itemBuilder: (context, index) {
-                    final entry = displayedEntries[index];
-                    return InkWell( // Keep InkWell for potential future taps or just for the ripple effect
-                      child: Padding(
+                return AnimationLimiter(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
+                    itemCount: displayedEntries.length,
+                    itemBuilder: (context, index) {
+                      final entry = displayedEntries[index];
+                      return AnimationConfiguration.staggeredList(
+                        position: index,
+                        duration: const Duration(milliseconds: 375),
+                        child: SlideAnimation(
+                          verticalOffset: 50.0,
+                          child: FadeInAnimation(
+                            child: InkWell( // Keep InkWell for potential future taps or just for the ripple effect
+                              onTap: () { HapticFeedback.selectionClick(); },
+                              child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
                         child: LiquidGlassContainer(
                           blur: AppTheme.defaultBlur,
@@ -638,16 +656,18 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
                               const SizedBox(height: 8.0),
                               _buildInfoRow(context, Icons.access_time, 'Date & Time: ${entry.dateTime.toLocal().toString().substring(0, 16)}'),
                               const SizedBox(height: 4.0),
-                              _buildInfoRow(context, Icons.location_on_outlined, 'From: ${entry.source}'),
+                              _buildInfoRow(context, Icons.location_on_outlined, 'Pickup: ${entry.source}'),
                               const SizedBox(height: 4.0),
-                              _buildInfoRow(context, Icons.flag_outlined, 'To: ${entry.destination}'),
+                              _buildInfoRow(context, Icons.flag_outlined, 'Drop: ${entry.destination}'),
                             ],
                           ),
                         ),
-                      ),
-                      ),
-                    );
-                  },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 );
               }
             },
@@ -940,10 +960,10 @@ class _AddScreenState extends State<AddScreen> {
               const SizedBox(height: 16.0),
               TextFormField(
                 controller: _sourceController,
-                decoration: const InputDecoration(labelText: 'Source'),
+                decoration: const InputDecoration(labelText: 'Pickup'),
                  validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter source location';
+                    return 'Please enter pickup location';
                   }
                   return null;
                 },
@@ -951,10 +971,10 @@ class _AddScreenState extends State<AddScreen> {
               const SizedBox(height: 16.0),
               TextFormField(
                 controller: _destinationController,
-                decoration: const InputDecoration(labelText: 'Destination'),
+                decoration: const InputDecoration(labelText: 'Drop'),
                  validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter destination location';
+                    return 'Please enter drop location';
                   }
                   return null;
                 },
@@ -1121,7 +1141,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     child: CheckboxListTile(
                     title: Text(entry.customerName),
                     subtitle: Text(
-                        '${entry.source} to ${entry.destination}\n${entry.dateTime.toLocal().toString().substring(0, 16)}'),
+                        'Pickup: ${entry.source} to Drop: ${entry.destination}\n${entry.dateTime.toLocal().toString().substring(0, 16)}'),
                     value: isSelected,
                     onChanged: entry.id == null ? null : (bool? selected) {
                       _toggleSelection(entry.id!);

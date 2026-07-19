@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class AppTheme {
   // Common values for LiquidGlassContainer
@@ -26,6 +27,7 @@ class AppTheme {
       colorScheme: colorScheme,
       useMaterial3: true,
       scaffoldBackgroundColor: Colors.transparent, // Ensure the background decoration is visible
+      textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme),
       
       // Global app bar theme
       appBarTheme: AppBarTheme(
@@ -78,7 +80,7 @@ class AppTheme {
         ),
         focusedBorder: OutlineInputBorder(
           borderRadius: BorderRadius.circular(10.0),
-          borderSide: BorderSide(color: colorScheme.primary, width: 2.0),
+          borderSide: const BorderSide(color: Color(0xFFD4AF37), width: 2.5), // Glowing gold focus border
         ),
         contentPadding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 12.0),
       ),

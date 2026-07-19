@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:liquid_glass_ui/liquid_glass_ui.dart';
+import 'package:flutter/services.dart';
+import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'database_helper.dart';
 import 'main.dart'; // Assuming DriveEntry is in main.dart
 import 'theme.dart';
@@ -96,10 +98,17 @@ class _TicketsScreenState extends State<TicketsScreen> {
               } else if (snapshot.hasError) {
                 return Center(child: Text('Error: ${snapshot.error}'));
               } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                return const Center(
-                  child: Text(
-                    'No ticket entries available.',
-                    style: TextStyle(fontSize: 18, color: Colors.grey),
+                return Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Icon(Icons.confirmation_num_outlined, size: 64, color: Colors.white.withOpacity(0.5)),
+                      const SizedBox(height: 16),
+                      Text(
+                        'No ticket entries available.',
+                        style: TextStyle(fontSize: 18, color: Colors.white.withOpacity(0.7)),
+                      ),
+                    ],
                   ),
                 );
               } else {
@@ -114,19 +123,27 @@ class _TicketsScreenState extends State<TicketsScreen> {
                       child: Text(
                         'No ticket entries found for "$_selectedFilter".',
                         textAlign: TextAlign.center,
-                        style: const TextStyle(fontSize: 18, color: Colors.grey),
+                        style: TextStyle(fontSize: 18, color: Colors.white.withOpacity(0.7)),
                       ),
                     )
                   );
                 }
-                return ListView.builder(
-                  padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
-                  itemCount: displayedEntries.length,
-                  itemBuilder: (context, index) {
-                    final entry = displayedEntries[index];
-                    // Display 'ticket' type entries
-                    return InkWell( // Keep InkWell for potential future taps or just for the ripple effect
-                      child: Padding(
+                return AnimationLimiter(
+                  child: ListView.builder(
+                    padding: const EdgeInsets.fromLTRB(8.0, 0, 8.0, 8.0),
+                    itemCount: displayedEntries.length,
+                    itemBuilder: (context, index) {
+                      final entry = displayedEntries[index];
+                      // Display 'ticket' type entries
+                      return AnimationConfiguration.staggeredList(
+                        position: index,
+                        duration: const Duration(milliseconds: 375),
+                        child: SlideAnimation(
+                          verticalOffset: 50.0,
+                          child: FadeInAnimation(
+                            child: InkWell( // Keep InkWell for potential future taps or just for the ripple effect
+                              onTap: () { HapticFeedback.selectionClick(); },
+                              child: Padding(
                         padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
                         child: LiquidGlassContainer(
                           blur: AppTheme.defaultBlur,
@@ -144,16 +161,18 @@ class _TicketsScreenState extends State<TicketsScreen> {
                               const SizedBox(height: 8.0),
                               _buildInfoRow(context, Icons.access_time, 'Date & Time: ${entry.dateTime.toLocal().toString().substring(0, 16)}'),
                               const SizedBox(height: 4.0),
-                              _buildInfoRow(context, Icons.location_on_outlined, 'From: ${entry.source}'),
+                              _buildInfoRow(context, Icons.location_on_outlined, 'Pickup: ${entry.source}'),
                               const SizedBox(height: 4.0),
-                              _buildInfoRow(context, Icons.flag_outlined, 'To: ${entry.destination}'),
+                              _buildInfoRow(context, Icons.flag_outlined, 'Drop: ${entry.destination}'),
                             ],
                           ),
                         ),
-                      ),
-                      ),
-                    );
-                  },
+                            ),
+                          ),
+                        ),
+                      );
+                    },
+                  ),
                 );
               }
             },
