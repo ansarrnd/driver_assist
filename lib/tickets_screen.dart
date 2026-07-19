@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:liquid_glass_ui/liquid_glass_ui.dart';
 import 'database_helper.dart';
 import 'main.dart'; // Assuming DriveEntry is in main.dart
+import 'theme.dart';
 
 // Screen to display the list of ticket entries
 class TicketsScreen extends StatefulWidget {
@@ -124,13 +126,13 @@ class _TicketsScreenState extends State<TicketsScreen> {
                     final entry = displayedEntries[index];
                     // Display 'ticket' type entries
                     return InkWell( // Keep InkWell for potential future taps or just for the ripple effect
-                      child: Card(
-                        elevation: 4.0,
-                        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
-                        child: Padding(
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                        child: LiquidGlassContainer(
+                          blur: AppTheme.defaultBlur,
+                          opacity: AppTheme.defaultOpacity,
+                          borderRadius: AppTheme.defaultBorderRadius,
+                          child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -148,6 +150,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
                             ],
                           ),
                         ),
+                      ),
                       ),
                     );
                   },

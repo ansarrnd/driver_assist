@@ -1,5 +1,5 @@
 buildscript {
-    val kotlin_version by extra("1.9.23") // You can update this to your desired Kotlin version
+    val kotlin_version by extra("2.1.0") // You can update this to your desired Kotlin version
     repositories {
         google()
         mavenCentral()

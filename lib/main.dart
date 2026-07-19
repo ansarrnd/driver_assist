@@ -6,7 +6,9 @@ import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:timezone/timezone.dart' as tz;
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
+import 'package:liquid_glass_ui/liquid_glass_ui.dart';
 import 'tickets_screen.dart'; // Import the new TicketsScreen
+import 'theme.dart';
 
 class NotificationService {
   static final NotificationService _notificationService = NotificationService._internal();
@@ -340,10 +342,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'Driver Schedule',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true, // Recommended for new Flutter projects
-      ),
+      theme: AppTheme.themeData,
       home: const MyHomePage(title: 'Flutter Demo Home Page'),
     );
   }
@@ -416,17 +415,20 @@ class _MyHomePageState extends State<MyHomePage> with SingleTickerProviderStateM
               )
             : null,
       ),
-      body: Center(
-        // Display the widget from _widgetOptions based on the selected index
-        child: _selectedIndex == 0
-            ? TabBarView(
-                controller: _driveScheduleTabController,
-                children: <Widget>[
-                  const DriveScheduleScreen(), // Content for "Trips" tab
-                  const TicketsScreen(),       // Content for "Tickets" tab
-                ],
-              )
-            : _widgetOptions.elementAt(_selectedIndex),
+      body: Container(
+        decoration: AppTheme.backgroundDecoration,
+        child: Center(
+          // Display the widget from _widgetOptions based on the selected index
+          child: _selectedIndex == 0
+              ? TabBarView(
+                  controller: _driveScheduleTabController,
+                  children: <Widget>[
+                    const DriveScheduleScreen(), // Content for "Trips" tab
+                    const TicketsScreen(),       // Content for "Tickets" tab
+                  ],
+                )
+              : _widgetOptions.elementAt(_selectedIndex),
+        ),
       ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
@@ -618,12 +620,12 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
                   itemBuilder: (context, index) {
                     final entry = displayedEntries[index];
                     return InkWell( // Keep InkWell for potential future taps or just for the ripple effect
-                      child: Card(
-                        elevation: 4.0,
-                        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(10.0),
-                        ),
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                        child: LiquidGlassContainer(
+                          blur: AppTheme.defaultBlur,
+                          opacity: AppTheme.defaultOpacity,
+                          borderRadius: AppTheme.defaultBorderRadius,
                         child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
@@ -642,6 +644,7 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
                             ],
                           ),
                         ),
+                      ),
                       ),
                     );
                   },
@@ -852,7 +855,12 @@ class _AddScreenState extends State<AddScreen> {
   Widget build(BuildContext context) {
     Widget formContent = Padding(
         padding: const EdgeInsets.all(16.0),
-        child: Form(
+        child: LiquidGlassContainer(
+          blur: AppTheme.defaultBlur,
+          opacity: AppTheme.defaultOpacity,
+          borderRadius: AppTheme.defaultBorderRadius,
+          padding: const EdgeInsets.all(16.0),
+          child: Form(
           key: _formKey, // Wrap with SingleChildScrollView to prevent overflow
           child: SingleChildScrollView(
             child: Column(
@@ -959,6 +967,7 @@ class _AddScreenState extends State<AddScreen> {
             ],
           ),
           ),
+        ),
         ),
       );
 
@@ -1103,9 +1112,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 final entry = _allEntries[index];
                 // DriveEntry.id is String?, but should be non-null for DB entries
                 final isSelected = entry.id != null && _selectedEntryIds.contains(entry.id!);
-                return Card(
-                  margin: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
-                  child: CheckboxListTile(
+                return Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
+                  child: LiquidGlassContainer(
+                    blur: AppTheme.defaultBlur,
+                    opacity: AppTheme.defaultOpacity,
+                    borderRadius: AppTheme.defaultBorderRadius,
+                    child: CheckboxListTile(
                     title: Text(entry.customerName),
                     subtitle: Text(
                         '${entry.source} to ${entry.destination}\n${entry.dateTime.toLocal().toString().substring(0, 16)}'),
@@ -1115,6 +1128,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     },
                     secondary: Icon(isSelected ? Icons.check_box : Icons.check_box_outline_blank),
                     isThreeLine: true,
+                  ),
                   ),
                 );
               },
