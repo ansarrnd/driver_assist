@@ -47,7 +47,7 @@ class AppTheme {
       ),
 
       // Global Tab Bar theme
-      tabBarTheme: const TabBarTheme(
+      tabBarTheme: const TabBarThemeData(
         labelColor: Color(0xFFD4AF37), // RCB Gold
         unselectedLabelColor: Colors.white70,
         indicatorColor: Color(0xFFD4AF37), // RCB Gold
