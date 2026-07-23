@@ -167,11 +167,13 @@ class _TicketsScreenState extends State<TicketsScreen> {
                             ],
                           ),
                         ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
                   ),
                 );
               }

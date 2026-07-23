@@ -662,11 +662,13 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
                             ],
                           ),
                         ),
-                            ),
-                          ),
-                        ),
-                      );
-                    },
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            );
+          },
                   ),
                 );
               }
