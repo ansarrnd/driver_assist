@@ -1,34 +1,34 @@
 import 'package:flutter/material.dart';
-import 'package:liquid_glass_ui/liquid_glass_ui.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
-import 'database_helper.dart';
-import 'models/drive_entry.dart';
-import 'theme.dart';
+import 'package:liquid_glass_ui/liquid_glass_ui.dart';
+import '../database_helper.dart';
+import '../models/drive_entry.dart';
+import '../theme.dart';
 
-// Screen to display the list of ticket entries
-class TicketsScreen extends StatefulWidget {
-  const TicketsScreen({super.key});
+// Screen to display the list of drive schedules
+class DriveScheduleScreen extends StatefulWidget {
+  const DriveScheduleScreen({super.key});
   @override
-  State<TicketsScreen> createState() => _TicketsScreenState();
+  State<DriveScheduleScreen> createState() => _DriveScheduleScreenState();
 }
 
-class _TicketsScreenState extends State<TicketsScreen> {
-  // Filter options (can be customized for tickets if needed)
+class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
+  // Filter options
   final List<String> _filterOptions = ['Today', 'Week', 'Month'];
   String _selectedFilter = 'Month'; // Default filter
-  late Future<List<DriveEntry>> _ticketEntriesFuture;
+  late Future<List<DriveEntry>> _driveEntriesFuture;
 
   @override
   void initState() {
     super.initState();
-    _refreshTicketEntries();
+    _refreshDriveEntries();
   }
 
-  void _refreshTicketEntries() {
+  void _refreshDriveEntries() {
     setState(() {
-      // Fetch only 'ticket' type entries
-      _ticketEntriesFuture = DatabaseHelper.instance.getDriveEntriesByType('ticket');
+      // DriveScheduleScreen should only show 'trip' type entries
+      _driveEntriesFuture = DatabaseHelper.instance.getDriveEntriesByType('trip');
     });
   }
 
@@ -83,7 +83,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
                 setState(() {
                   _selectedFilter = newValue;
                   // Re-filtering happens in the FutureBuilder based on the new _selectedFilter
-                  // No need to call _refreshTicketEntries unless you want to re-fetch from DB on filter change
+                  // No need to call _refreshDriveEntries unless you want to re-fetch from DB on filter change
                 });
               }
             },
@@ -91,7 +91,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
         ),
         Expanded(
           child: FutureBuilder<List<DriveEntry>>(
-            future: _ticketEntriesFuture,
+            future: _driveEntriesFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -102,10 +102,10 @@ class _TicketsScreenState extends State<TicketsScreen> {
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
-                      Icon(Icons.confirmation_num_outlined, size: 64, color: Colors.white.withOpacity(0.5)),
+                      Icon(Icons.directions_car_outlined, size: 64, color: Colors.white.withOpacity(0.5)),
                       const SizedBox(height: 16),
                       Text(
-                        'No ticket entries available.',
+                        'No drive schedules available.',
                         style: TextStyle(fontSize: 18, color: Colors.white.withOpacity(0.7)),
                       ),
                     ],
@@ -121,7 +121,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
                     child: Padding(
                       padding: const EdgeInsets.all(16.0),
                       child: Text(
-                        'No ticket entries found for "$_selectedFilter".',
+                        'No drive schedules found for "$_selectedFilter".',
                         textAlign: TextAlign.center,
                         style: TextStyle(fontSize: 18, color: Colors.white.withOpacity(0.7)),
                       ),
@@ -134,7 +134,6 @@ class _TicketsScreenState extends State<TicketsScreen> {
                     itemCount: displayedEntries.length,
                     itemBuilder: (context, index) {
                       final entry = displayedEntries[index];
-                      // Display 'ticket' type entries
                       return AnimationConfiguration.staggeredList(
                         position: index,
                         duration: const Duration(milliseconds: 375),
@@ -149,7 +148,7 @@ class _TicketsScreenState extends State<TicketsScreen> {
                           blur: AppTheme.defaultBlur,
                           opacity: AppTheme.defaultOpacity,
                           borderRadius: AppTheme.defaultBorderRadius,
-                          child: Padding(
+                        child: Padding(
                           padding: const EdgeInsets.all(16.0),
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
@@ -183,17 +182,16 @@ class _TicketsScreenState extends State<TicketsScreen> {
       ],
     );
   }
-}
 
-// Helper function for building info rows (can be shared or duplicated)
-Widget _buildInfoRow(BuildContext context, IconData icon, String text) {
-  return Row(
-    children: <Widget>[
-      Icon(icon, size: 18.0, color: Theme.of(context).colorScheme.primary),
-      const SizedBox(width: 8.0),
-      Expanded(
-        child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
-      ),
-    ],
-  );
+  Widget _buildInfoRow(BuildContext context, IconData icon, String text) {
+    return Row(
+      children: <Widget>[
+        Icon(icon, size: 18.0, color: Theme.of(context).colorScheme.primary),
+        const SizedBox(width: 8.0),
+        Expanded(
+          child: Text(text, style: Theme.of(context).textTheme.bodyMedium),
+        ),
+      ],
+    );
+  }
 }
