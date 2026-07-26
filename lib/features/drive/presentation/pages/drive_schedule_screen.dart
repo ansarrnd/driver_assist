@@ -126,9 +126,16 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
                                     child: Column(
                                       crossAxisAlignment: CrossAxisAlignment.start,
                                       children: <Widget>[
-                                        Text(
-                                          entry.customerName,
-                                          style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                        Row(
+                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Text(
+                                              entry.customerName,
+                                              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                            ),
+                                            if (entry.alarmOffsetMinutes != null)
+                                              Icon(Icons.notifications_active, color: Theme.of(context).colorScheme.secondary, size: 20),
+                                          ],
                                         ),
                                         const SizedBox(height: 8.0),
                                         _buildInfoRow(context, Icons.access_time, 'Date & Time: ${entry.dateTime.toLocal().toString().substring(0, 16)}'),

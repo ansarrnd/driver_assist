@@ -7,6 +7,7 @@ class DriveEntity extends Equatable {
   final String destination;
   final DateTime dateTime;
   final String type;
+  final int? alarmOffsetMinutes;
 
   const DriveEntity({
     this.id,
@@ -15,6 +16,7 @@ class DriveEntity extends Equatable {
     required this.destination,
     required this.dateTime,
     this.type = 'trip',
+    this.alarmOffsetMinutes,
   });
 
   factory DriveEntity.fromJson(Map<String, dynamic> json) {
@@ -25,6 +27,7 @@ class DriveEntity extends Equatable {
       destination: json['destination'] as String,
       dateTime: DateTime.parse(json['dateTime'] as String),
       type: json['type'] as String? ?? 'trip',
+      alarmOffsetMinutes: json['alarmOffsetMinutes'] as int?,
     );
   }
 
@@ -36,6 +39,7 @@ class DriveEntity extends Equatable {
       'destination': destination,
       'dateTime': dateTime.toIso8601String(),
       'type': type,
+      'alarmOffsetMinutes': alarmOffsetMinutes,
     };
   }
 
@@ -46,6 +50,7 @@ class DriveEntity extends Equatable {
     String? destination,
     DateTime? dateTime,
     String? type,
+    int? alarmOffsetMinutes,
   }) {
     return DriveEntity(
       id: id ?? this.id,
@@ -54,9 +59,10 @@ class DriveEntity extends Equatable {
       destination: destination ?? this.destination,
       dateTime: dateTime ?? this.dateTime,
       type: type ?? this.type,
+      alarmOffsetMinutes: alarmOffsetMinutes ?? this.alarmOffsetMinutes,
     );
   }
 
   @override
-  List<Object?> get props => [id, customerName, source, destination, dateTime, type];
+  List<Object?> get props => [id, customerName, source, destination, dateTime, type, alarmOffsetMinutes];
 }

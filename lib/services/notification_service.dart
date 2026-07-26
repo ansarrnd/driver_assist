@@ -55,9 +55,17 @@ class NotificationService {
       print('Error: DriveEntry ID is null. Cannot schedule notification.');
       return;
     }
+    
     final int notificationId = entry.id ?? entry.hashCode;
+
+    if (entry.alarmOffsetMinutes == null) {
+      print('Alarm offset is null. Cancelling notification if exists for entry ${entry.id}.');
+      await flutterLocalNotificationsPlugin.cancel(notificationId);
+      return;
+    }
+
     final tz.TZDateTime scheduledTime =
-        tz.TZDateTime.from(entry.dateTime.subtract(const Duration(days: 1)), tz.local);
+        tz.TZDateTime.from(entry.dateTime.subtract(Duration(minutes: entry.alarmOffsetMinutes!)), tz.local);
 
     if (scheduledTime.isBefore(tz.TZDateTime.now(tz.local))) {
       print('Notification time for entry ${entry.id} is in the past. Not scheduling.');
@@ -79,7 +87,7 @@ class NotificationService {
     await flutterLocalNotificationsPlugin.zonedSchedule(
       notificationId,
       'Upcoming Drive Reminder',
-      'Drive for ${entry.customerName} on ${entry.dateTime.toLocal().toString().substring(0, 10)} at ${entry.dateTime.toLocal().toString().substring(11, 16)}. Pickup: ${entry.source} to Drop: ${entry.destination}. (Tomorrow)',
+      'Drive for ${entry.customerName} on ${entry.dateTime.toLocal().toString().substring(0, 10)} at ${entry.dateTime.toLocal().toString().substring(11, 16)}. Pickup: ${entry.source} to Drop: ${entry.destination}.',
       scheduledTime,
       notificationDetails,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

@@ -30,6 +30,7 @@ class AddDriveEntryPage extends HookWidget {
     final timeController = useTextEditingController(text: selectedTime.value != null ? selectedTime.value!.format(context) : '');
     
     final selectedType = useState<String>(entryToEdit?.type ?? 'trip');
+    final selectedAlarmOffset = useState<int?>(entryToEdit != null ? entryToEdit!.alarmOffsetMinutes : 1440); // 1440 = 1 day
 
     Future<void> selectDate(BuildContext context) async {
       final DateTime? picked = await showDatePicker(
@@ -85,6 +86,7 @@ class AddDriveEntryPage extends HookWidget {
           source: sourceController.text,
           destination: destinationController.text,
           type: selectedType.value,
+          alarmOffsetMinutes: selectedAlarmOffset.value,
         );
 
         // Dispatches to the BLoC which saves to the local datasource
@@ -195,6 +197,22 @@ class AddDriveEntryPage extends HookWidget {
                   controller: destinationController,
                   decoration: const InputDecoration(labelText: 'Drop'),
                   validator: (value) => value == null || value.isEmpty ? 'Please enter drop location' : null,
+                ),
+                const SizedBox(height: 16.0),
+                DropdownButtonFormField<int?>(
+                  decoration: const InputDecoration(labelText: 'Set Reminder Alarm'),
+                  value: selectedAlarmOffset.value,
+                  onChanged: (int? newValue) {
+                    selectedAlarmOffset.value = newValue;
+                  },
+                  items: const [
+                    DropdownMenuItem(value: null, child: Text('None (Remove Alarm)')),
+                    DropdownMenuItem(value: 0, child: Text('At time of trip')),
+                    DropdownMenuItem(value: 15, child: Text('15 minutes before')),
+                    DropdownMenuItem(value: 30, child: Text('30 minutes before')),
+                    DropdownMenuItem(value: 60, child: Text('1 hour before')),
+                    DropdownMenuItem(value: 1440, child: Text('1 day before')),
+                  ],
                 ),
                 const SizedBox(height: 24.0),
                 ElevatedButton(

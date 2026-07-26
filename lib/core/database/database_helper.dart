@@ -7,7 +7,7 @@ import 'dart:io';
 
 class DatabaseHelper {
   static const _databaseName = "DriveScheduleApp.db";
-  static const _databaseVersion = 4; // Incremented version
+  static const _databaseVersion = 5; // Incremented version
 
   static const tableDriveEntries = 'drive_entries';
 
@@ -17,6 +17,7 @@ class DatabaseHelper {
   static const columnSource = 'source';
   static const columnDestination = 'destination';
   static const columnType = 'type'; // New column for 'trip' or 'ticket'
+  static const columnAlarmOffsetMinutes = 'alarmOffsetMinutes';
 
   // Make this a singleton class
   DatabaseHelper._privateConstructor();
@@ -51,7 +52,8 @@ class DatabaseHelper {
             $columnDateTime TEXT NOT NULL,
             $columnSource TEXT NOT NULL,
             $columnDestination TEXT NOT NULL,
-            $columnType TEXT NOT NULL DEFAULT 'trip' -- Add type column with default
+            $columnType TEXT NOT NULL DEFAULT 'trip',
+            $columnAlarmOffsetMinutes INTEGER
           )
           ''');
   }
@@ -61,6 +63,9 @@ class DatabaseHelper {
     if (oldVersion < 3) {
       // Add the 'type' column if upgrading from a version before 3
       await db.execute('ALTER TABLE $tableDriveEntries ADD COLUMN $columnType TEXT NOT NULL DEFAULT \'trip\'');
+    }
+    if (oldVersion < 5) {
+      await db.execute('ALTER TABLE $tableDriveEntries ADD COLUMN $columnAlarmOffsetMinutes INTEGER');
     }
     // Add other upgrade paths here if needed for future versions
   }
