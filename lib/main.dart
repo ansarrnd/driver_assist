@@ -149,7 +149,9 @@ Future<void> main() async {
   // await notificationService.showAppOpenNotification();
 
   // Fetch all existing drive entries and schedule notifications for them
-  await AndroidAlarmManager.initialize(); // Initialize AlarmManager
+  if (Platform.isAndroid) {
+    await AndroidAlarmManager.initialize(); // Initialize AlarmManager
+  }
 
   try {
     final List<DriveEntry> allEntries = await DatabaseHelper.instance.getAllDriveEntries();
@@ -164,15 +166,17 @@ Future<void> main() async {
           final int alarmId = entryIntId + _alarmManagerIdOffset;
           // Only schedule for future drives
           if (entry.dateTime.isAfter(DateTime.now())) {
-            print('Scheduling AndroidAlarmManager for entry ${entry.id} at ${entry.dateTime} with alarm ID $alarmId');
-            await AndroidAlarmManager.oneShotAt(
-              entry.dateTime,
-              alarmId,
-              myCallback,
-              exact: true,
-              wakeup: true,
-              rescheduleOnReboot: true,
-            );
+            if (Platform.isAndroid) {
+              print('Scheduling AndroidAlarmManager for entry ${entry.id} at ${entry.dateTime} with alarm ID $alarmId');
+              await AndroidAlarmManager.oneShotAt(
+                entry.dateTime,
+                alarmId,
+                myCallback,
+                exact: true,
+                wakeup: true,
+                rescheduleOnReboot: true,
+              );
+            }
           } else {
             print('Skipping AndroidAlarmManager for past entry ${entry.id}');
           }
