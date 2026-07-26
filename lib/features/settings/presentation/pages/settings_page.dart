@@ -1,41 +1,25 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:liquid_glass_ui/liquid_glass_ui.dart';
-import '../database_helper.dart';
-import '../models/drive_entry.dart';
-import 'package:provider/provider.dart';
-import '../theme_provider.dart';
-import '../services/notification_service.dart';
-import '../theme.dart';
+import '../../../../core/theme/theme.dart';
+import '../../../drive/presentation/bloc/drive/drive_bloc.dart';
+import '../../../drive/presentation/bloc/drive/drive_event.dart';
+import '../../../drive/presentation/bloc/drive/drive_state.dart';
+import '../bloc/theme/theme_bloc.dart';
+import '../bloc/theme/theme_event.dart';
+import '../bloc/theme/theme_state.dart';
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+class SettingsPage extends StatefulWidget {
+  const SettingsPage({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  State<SettingsPage> createState() => _SettingsPageState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
-  late Future<List<DriveEntry>> _driveEntriesFuture;
-  List<DriveEntry> _allEntries = [];
-  final Set<String> _selectedEntryIds = {}; // Store String IDs from DriveEntry.id
+class _SettingsPageState extends State<SettingsPage> {
+  final Set<int> _selectedEntryIds = {};
 
-  @override
-  void initState() {
-    super.initState();
-    _refreshDriveEntries();
-  }
-
-  void _refreshDriveEntries() {
-    setState(() {
-      _driveEntriesFuture = DatabaseHelper.instance.getAllDriveEntries().then((entries) {
-        _allEntries = entries;
-        return entries;
-      });
-      _selectedEntryIds.clear(); // Clear selection on refresh
-    });
-  }
-
-  void _toggleSelection(String entryId) {
+  void _toggleSelection(int entryId) {
     setState(() {
       if (_selectedEntryIds.contains(entryId)) {
         _selectedEntryIds.remove(entryId);
@@ -74,25 +58,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
 
     if (confirmed == true) {
-      int successCount = 0;
-      int failCount = 0;
-      List<String> idsToDelete = List.from(_selectedEntryIds);
-
-      for (String entryIdString in idsToDelete) {
-          try {
-            await DatabaseHelper.instance.deleteDriveEntry(entryIdString); // Pass the String ID
-            await notificationService.cancelNotification(entryIdString); // Cancel notification
-            successCount++;
-          } catch (e) {
-            print('Error deleting entry ID $entryIdString: $e');
-            failCount++;
-          } // This closes the catch block
+      final driveBloc = context.read<DriveBloc>();
+      for (int id in _selectedEntryIds) {
+        driveBloc.add(DeleteDriveEvent(id));
       }
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('$successCount entries deleted. $failCount failed.')),
-      );
-      _refreshDriveEntries(); // Refresh the list and clear selection
+      setState(() {
+        _selectedEntryIds.clear();
+      });
     }
   }
 
@@ -118,13 +90,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 const Text('App Theme', style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
-                Consumer<ThemeProvider>(
-                  builder: (context, themeProvider, child) {
+                BlocBuilder<ThemeBloc, ThemeState>(
+                  builder: (context, state) {
                     return DropdownButton<ThemeType>(
-                      value: themeProvider.currentTheme,
+                      value: state.themeType,
                       onChanged: (ThemeType? newValue) {
                         if (newValue != null) {
-                          themeProvider.setTheme(newValue);
+                          context.read<ThemeBloc>().add(ChangeThemeEvent(newValue));
                         }
                       },
                       items: const [
@@ -154,27 +126,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ),
           ),
           Expanded(
-            child: FutureBuilder<List<DriveEntry>>(
-              future: _driveEntriesFuture,
-              builder: (context, snapshot) {
-                if (snapshot.connectionState == ConnectionState.waiting) {
+            child: BlocBuilder<DriveBloc, DriveState>(
+              builder: (context, state) {
+                if (state is DriveLoading) {
                   return const Center(child: CircularProgressIndicator());
-                } else if (snapshot.hasError) {
-                  return Center(child: Text('Error loading entries: ${snapshot.error}'));
-                } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                  return const Center(
-                    child: Text(
-                      'No drive entries found.',
-                      style: TextStyle(fontSize: 18, color: Colors.grey),
-                    ),
-                  );
-                } else {
-                  // _allEntries is updated by _refreshDriveEntries
+                } else if (state is DriveError) {
+                  return Center(child: Text('Error loading entries: ${state.message}'));
+                } else if (state is DriveLoaded) {
+                  if (state.drives.isEmpty) {
+                    return const Center(
+                      child: Text(
+                        'No drive entries found.',
+                        style: TextStyle(fontSize: 18, color: Colors.grey),
+                      ),
+                    );
+                  }
                   return ListView.builder(
-                    itemCount: _allEntries.length,
+                    itemCount: state.drives.length,
                     itemBuilder: (context, index) {
-                      final entry = _allEntries[index];
-                      // DriveEntry.id is String?, but should be non-null for DB entries
+                      final entry = state.drives[index];
                       final isSelected = entry.id != null && _selectedEntryIds.contains(entry.id!);
                       return Padding(
                         padding: const EdgeInsets.symmetric(vertical: 4.0, horizontal: 8.0),
@@ -183,24 +153,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           opacity: AppTheme.defaultOpacity,
                           borderRadius: AppTheme.defaultBorderRadius,
                           child: Material(
-                            color: Colors.transparent,
+                            type: MaterialType.transparency,
                             child: CheckboxListTile(
-                          title: Text(entry.customerName),
-                          subtitle: Text(
-                              'Pickup: ${entry.source} to Drop: ${entry.destination}\n${entry.dateTime.toLocal().toString().substring(0, 16)}'),
-                          value: isSelected,
-                          onChanged: entry.id == null ? null : (bool? selected) {
-                            _toggleSelection(entry.id!);
-                          },
-                          secondary: Icon(isSelected ? Icons.check_box : Icons.check_box_outline_blank),
-                          isThreeLine: true,
-                        ),
-                        ),
+                              title: Text(entry.customerName),
+                              subtitle: Text(
+                                  'Pickup: ${entry.source} to Drop: ${entry.destination}\n${entry.dateTime.toLocal().toString().substring(0, 16)}'),
+                              value: isSelected,
+                              onChanged: entry.id == null
+                                  ? null
+                                  : (bool? selected) {
+                                      _toggleSelection(entry.id!);
+                                    },
+                              secondary: Icon(isSelected ? Icons.check_box : Icons.check_box_outline_blank),
+                              isThreeLine: true,
+                            ),
+                          ),
                         ),
                       );
                     },
                   );
                 }
+                return const SizedBox();
               },
             ),
           ),

@@ -1,7 +1,7 @@
 import 'dart:io';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:timezone/timezone.dart' as tz;
-import '../models/drive_entry.dart';
+import '../features/drive/domain/entities/drive_entity.dart';
 
 class NotificationService {
   static final NotificationService _notificationService = NotificationService._internal();
@@ -50,12 +50,12 @@ class NotificationService {
     }
   }
 
-  Future<void> scheduleDriveNotification(DriveEntry entry) async {
+  Future<void> scheduleDriveNotification(DriveEntity entry) async {
     if (entry.id == null) {
       print('Error: DriveEntry ID is null. Cannot schedule notification.');
       return;
     }
-    final int notificationId = int.tryParse(entry.id!) ?? entry.hashCode;
+    final int notificationId = entry.id ?? entry.hashCode;
     final tz.TZDateTime scheduledTime =
         tz.TZDateTime.from(entry.dateTime.subtract(const Duration(days: 1)), tz.local);
 

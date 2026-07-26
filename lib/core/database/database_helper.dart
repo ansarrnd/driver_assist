@@ -3,11 +3,11 @@ import 'package:sqflite/sqflite.dart';
 import 'package:path/path.dart';
 import 'package:path_provider/path_provider.dart';
 import 'dart:io';
-import 'models/drive_entry.dart';
+
 
 class DatabaseHelper {
   static const _databaseName = "DriveScheduleApp.db";
-  static const _databaseVersion = 3; // Incremented version for 'type' column
+  static const _databaseVersion = 4; // Incremented version
 
   static const tableDriveEntries = 'drive_entries';
 
@@ -65,67 +65,4 @@ class DatabaseHelper {
     // Add other upgrade paths here if needed for future versions
   }
 
-  // Inserts a row in the database. The return value is the id of the inserted row.
-  // The type is included in entry.toMap()
-  Future<int> insertDriveEntry(DriveEntry entry) async {
-    Database db = await instance.database;
-    return await db.insert(tableDriveEntries, entry.toMap());
-  }
-
-  // Retrieves all rows from the drive_entries table.
-  Future<List<DriveEntry>> getAllDriveEntries() async {
-    Database db = await instance.database;
-    // Query the table for all The Entries.
-    final List<Map<String, dynamic>> maps = await db.query(
-      tableDriveEntries,
-      orderBy: "$columnId DESC",
-    );
-
-    // Convert the List<Map<String, dynamic>> into a List<DriveEntry>.
-    if (maps.isEmpty) {
-      return [];
-    }
-    return List.generate(maps.length, (i) {
-      return DriveEntry.fromMap(maps[i]);
-    });
-  }
-
-  // Retrieves entries of a specific type
-  Future<List<DriveEntry>> getDriveEntriesByType(String type) async {
-    Database db = await instance.database;
-    final List<Map<String, dynamic>> maps = await db.query(
-      tableDriveEntries,
-      where: '$columnType = ?',
-      whereArgs: [type],
-      orderBy: "$columnId DESC",
-    );
-
-    // Convert the List<Map<String, dynamic>> into a List<DriveEntry>.
-    if (maps.isEmpty) {
-      return [];
-    }
-    return List.generate(maps.length, (i) {
-      return DriveEntry.fromMap(maps[i]);
-    });
-  }
-
-  // We are assuming here that the id column in the map is the primary key
-  Future<int> updateDriveEntry(DriveEntry entry) async {
-    Database db = await instance.database;
-    return await db.update(
-      tableDriveEntries,
-      entry.toMap(),
-      where: '$columnId = ?',
-      whereArgs: [entry.id],
-    );
-  }
-
-  Future<int> deleteDriveEntry(String id) async {
-    Database db = await instance.database;
-    return await db.delete(
-      tableDriveEntries,
-      where: '$columnId = ?',
-      whereArgs: [int.parse(id)], // Assuming id in DriveEntry is String, but DB stores int
-    );
-  }
 }
