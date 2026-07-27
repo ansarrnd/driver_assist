@@ -80,9 +80,13 @@ class NotificationService {
       importance: Importance.max,
       priority: Priority.high,
       ticker: 'ticker',
+      sound: RawResourceAndroidNotificationSound('alarm_sound'),
     );
     const NotificationDetails notificationDetails =
-        NotificationDetails(android: androidNotificationDetails);
+        NotificationDetails(
+            android: androidNotificationDetails,
+            iOS: DarwinNotificationDetails(sound: 'alarm_sound.mp3'),
+        );
 
     await flutterLocalNotificationsPlugin.zonedSchedule(
       notificationId,

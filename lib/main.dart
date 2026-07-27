@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 import 'services/notification_service.dart';
 import 'core/routes/app_router.dart';
@@ -25,6 +26,11 @@ Future<void> main() async {
   }
   
   await di.init();
+  
+  final prefs = await SharedPreferences.getInstance();
+  final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
+  
+  AppRouter.initialize(hasSeenOnboarding);
 
   runApp(const MyApp());
 }

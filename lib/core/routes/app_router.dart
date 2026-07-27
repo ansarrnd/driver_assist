@@ -4,15 +4,26 @@ import 'package:go_router/go_router.dart';
 import '../../features/drive/presentation/pages/home_page.dart';
 import '../../features/settings/presentation/pages/settings_page.dart';
 import '../../features/drive/presentation/pages/add_drive_entry_page.dart';
+import '../../features/drive/domain/entities/drive_entity.dart';
+
+import '../../features/settings/presentation/pages/onboarding_page.dart';
 
 // ShellRoute key
 final GlobalKey<NavigatorState> _rootNavigatorKey = GlobalKey<NavigatorState>();
 
 class AppRouter {
-  static final router = GoRouter(
-    navigatorKey: _rootNavigatorKey,
-    initialLocation: '/',
-    routes: [
+  static late GoRouter router;
+
+  static void initialize(bool hasSeenOnboarding) {
+    router = GoRouter(
+      navigatorKey: _rootNavigatorKey,
+      initialLocation: hasSeenOnboarding ? '/' : '/onboarding',
+      routes: [
+        GoRoute(
+          path: '/onboarding',
+          parentNavigatorKey: _rootNavigatorKey,
+          builder: (context, state) => const OnboardingPage(),
+        ),
       StatefulShellRoute.indexedStack(
         builder: (context, state, navigationShell) {
           return ScaffoldWithNavBar(navigationShell: navigationShell);
@@ -44,8 +55,17 @@ class AppRouter {
           ),
         ],
       ),
+      GoRoute(
+        path: '/edit-drive',
+        parentNavigatorKey: _rootNavigatorKey,
+        builder: (context, state) {
+          final entry = state.extra as DriveEntity?;
+          return AddDriveEntryPage(entryToEdit: entry);
+        },
+      ),
     ],
   );
+  }
 }
 
 class ScaffoldWithNavBar extends StatelessWidget {

@@ -127,7 +127,6 @@ class AddDriveEntryPage extends HookWidget {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: <Widget>[
-                const Text('Item Type:', style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
                 Row(
                   children: <Widget>[
                     Expanded(
@@ -189,14 +188,14 @@ class AddDriveEntryPage extends HookWidget {
                 const SizedBox(height: 16.0),
                 TextFormField(
                   controller: sourceController,
-                  decoration: const InputDecoration(labelText: 'Pickup'),
-                  validator: (value) => value == null || value.isEmpty ? 'Please enter pickup location' : null,
+                  decoration: InputDecoration(labelText: selectedType.value == 'trip' ? 'Pickup' : 'Source'),
+                  validator: (value) => value == null || value.isEmpty ? 'Please enter ${selectedType.value == 'trip' ? 'pickup' : 'source'} location' : null,
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
                   controller: destinationController,
-                  decoration: const InputDecoration(labelText: 'Drop'),
-                  validator: (value) => value == null || value.isEmpty ? 'Please enter drop location' : null,
+                  decoration: InputDecoration(labelText: selectedType.value == 'trip' ? 'Drop' : 'Destination'),
+                  validator: (value) => value == null || value.isEmpty ? 'Please enter ${selectedType.value == 'trip' ? 'drop' : 'destination'} location' : null,
                 ),
                 const SizedBox(height: 16.0),
                 DropdownButtonFormField<int?>(
@@ -232,7 +231,7 @@ class AddDriveEntryPage extends HookWidget {
         body: formContent,
       );
     } else {
-      return formContent;
+      return SafeArea(child: formContent);
     }
   }
 }

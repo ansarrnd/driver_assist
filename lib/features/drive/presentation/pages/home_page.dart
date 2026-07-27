@@ -48,8 +48,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             child: TabBarView(
               controller: _tabController,
               children: const <Widget>[
-                DriveScheduleScreen(),
-                Center(child: Text("Tickets coming soon")),
+                DriveScheduleScreen(filterType: 'trip'),
+                DriveScheduleScreen(filterType: 'ticket'),
               ],
             ),
           ),

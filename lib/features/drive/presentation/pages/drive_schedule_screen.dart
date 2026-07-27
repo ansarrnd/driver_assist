@@ -3,13 +3,16 @@ import 'package:flutter/services.dart';
 import 'package:flutter_staggered_animations/flutter_staggered_animations.dart';
 import 'package:liquid_glass_ui/liquid_glass_ui.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/entities/drive_entity.dart';
 import '../bloc/drive/drive_bloc.dart';
 import '../bloc/drive/drive_state.dart';
 
 class DriveScheduleScreen extends StatefulWidget {
-  const DriveScheduleScreen({super.key});
+  final String filterType;
+
+  const DriveScheduleScreen({super.key, required this.filterType});
   @override
   State<DriveScheduleScreen> createState() => _DriveScheduleScreenState();
 }
@@ -19,30 +22,29 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
   String _selectedFilter = 'Month';
 
   List<DriveEntity> _getFilteredEntries(List<DriveEntity> allEntries) {
-    // Only show trips
-    final trips = allEntries.where((e) => e.type == 'trip').toList();
+    final typeFilteredEntries = allEntries.where((e) => e.type == widget.filterType).toList();
 
     final now = DateTime.now();
     final today = DateTime(now.year, now.month, now.day);
 
     if (_selectedFilter == 'Today') {
-      return trips.where((entry) {
+      return typeFilteredEntries.where((entry) {
         final entryDate = DateTime(entry.dateTime.year, entry.dateTime.month, entry.dateTime.day);
         return entryDate.isAtSameMomentAs(today);
       }).toList();
     } else if (_selectedFilter == 'Week') {
       final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
       final endOfWeek = startOfWeek.add(const Duration(days: 6));
-      return trips.where((entry) {
+      return typeFilteredEntries.where((entry) {
         final entryDate = DateTime(entry.dateTime.year, entry.dateTime.month, entry.dateTime.day);
         return !entryDate.isBefore(startOfWeek) && !entryDate.isAfter(endOfWeek);
       }).toList();
     } else if (_selectedFilter == 'Month') {
-      return trips.where((entry) {
+      return typeFilteredEntries.where((entry) {
         return entry.dateTime.year == now.year && entry.dateTime.month == now.month;
       }).toList();
     }
-    return trips;
+    return typeFilteredEntries;
   }
 
   @override
@@ -114,7 +116,10 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
                           verticalOffset: 50.0,
                           child: FadeInAnimation(
                             child: InkWell(
-                              onTap: () { HapticFeedback.selectionClick(); },
+                              onTap: () {
+                                HapticFeedback.selectionClick();
+                                context.push('/edit-drive', extra: entry);
+                              },
                               child: Padding(
                                 padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
                                 child: LiquidGlassContainer(
@@ -133,16 +138,23 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
                                               entry.customerName,
                                               style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
                                             ),
-                                            if (entry.alarmOffsetMinutes != null)
-                                              Icon(Icons.notifications_active, color: Theme.of(context).colorScheme.secondary, size: 20),
+                                            Row(
+                                              children: [
+                                                if (entry.alarmOffsetMinutes != null) ...[
+                                                  Icon(Icons.notifications_active, color: Theme.of(context).colorScheme.secondary, size: 20),
+                                                  const SizedBox(width: 8),
+                                                ],
+                                                Icon(Icons.edit, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
+                                              ],
+                                            ),
                                           ],
                                         ),
                                         const SizedBox(height: 8.0),
                                         _buildInfoRow(context, Icons.access_time, 'Date & Time: ${entry.dateTime.toLocal().toString().substring(0, 16)}'),
                                         const SizedBox(height: 4.0),
-                                        _buildInfoRow(context, Icons.location_on_outlined, 'Pickup: ${entry.source}'),
+                                        _buildInfoRow(context, Icons.location_on_outlined, '${entry.type == 'trip' ? 'Pickup' : 'Source'}: ${entry.source}'),
                                         const SizedBox(height: 4.0),
-                                        _buildInfoRow(context, Icons.flag_outlined, 'Drop: ${entry.destination}'),
+                                        _buildInfoRow(context, Icons.flag_outlined, '${entry.type == 'trip' ? 'Drop' : 'Destination'}: ${entry.destination}'),
                                       ],
                                     ),
                                   ),
