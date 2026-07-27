@@ -25,9 +25,13 @@ class DriveLocalDataSourceImpl implements DriveLocalDataSource {
   @override
   Future<int> addDrive(DriveEntity drive) async {
     final db = await databaseHelper.database;
+    final json = drive.toJson();
+    if (drive.id == null) {
+      json.remove('_id');
+    }
     return await db.insert(
       DatabaseHelper.tableDriveEntries,
-      drive.toJson()..remove('_id'),
+      json,
       conflictAlgorithm: ConflictAlgorithm.replace,
     );
   }
