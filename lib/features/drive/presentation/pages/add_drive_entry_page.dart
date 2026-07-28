@@ -8,7 +8,7 @@ import '../../../../core/theme/theme.dart';
 import '../../domain/entities/drive_entity.dart';
 import '../bloc/drive/drive_bloc.dart';
 import '../bloc/drive/drive_event.dart';
-import '../../../../services/notification_service.dart';
+import '../../../../services/alarm_service.dart';
 
 class AddDriveEntryPage extends HookWidget {
   final DriveEntity? entryToEdit;
@@ -92,8 +92,8 @@ class AddDriveEntryPage extends HookWidget {
         // Dispatches to the BLoC which saves to the local datasource
         context.read<DriveBloc>().add(AddDriveEvent(entry));
         
-        // Also schedule notification
-        await notificationService.scheduleDriveNotification(entry);
+        // Also schedule alarm
+        await alarmService.scheduleDriveAlarm(entry);
 
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text(isEditMode ? 'Drive entry updated successfully!' : 'Drive entry saved successfully!')),

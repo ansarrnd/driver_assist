@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'dart:io';
 import 'package:timezone/data/latest_all.dart' as tz;
-import 'package:android_alarm_manager_plus/android_alarm_manager_plus.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
 import 'services/notification_service.dart';
+import 'services/alarm_service.dart';
 import 'core/routes/app_router.dart';
 import 'injection_container.dart' as di;
 import 'features/settings/presentation/bloc/theme/theme_bloc.dart';
@@ -20,10 +20,7 @@ Future<void> main() async {
   tz.initializeTimeZones();
   await notificationService.init();
   await notificationService.requestPermissions();
-
-  if (Platform.isAndroid) {
-    await AndroidAlarmManager.initialize();
-  }
+  await alarmService.init();
   
   await di.init();
   

@@ -1,7 +1,6 @@
 import 'dart:io';
+import 'dart:typed_data';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
-import 'package:timezone/timezone.dart' as tz;
-import '../features/drive/domain/entities/drive_entity.dart';
 
 class NotificationService {
   static final NotificationService _notificationService = NotificationService._internal();
@@ -50,66 +49,7 @@ class NotificationService {
     }
   }
 
-  Future<void> scheduleDriveNotification(DriveEntity entry) async {
-    if (entry.id == null) {
-      print('Error: DriveEntry ID is null. Cannot schedule notification.');
-      return;
-    }
-    
-    final int notificationId = entry.id ?? entry.hashCode;
 
-    if (entry.alarmOffsetMinutes == null) {
-      print('Alarm offset is null. Cancelling notification if exists for entry ${entry.id}.');
-      await flutterLocalNotificationsPlugin.cancel(notificationId);
-      return;
-    }
-
-    final tz.TZDateTime scheduledTime =
-        tz.TZDateTime.from(entry.dateTime.subtract(Duration(minutes: entry.alarmOffsetMinutes!)), tz.local);
-
-    if (scheduledTime.isBefore(tz.TZDateTime.now(tz.local))) {
-      print('Notification time for entry ${entry.id} is in the past. Not scheduling.');
-      return;
-    }
-
-    const AndroidNotificationDetails androidNotificationDetails =
-        AndroidNotificationDetails(
-      'drive_schedule_channel_id', // Unique channel ID
-      'Drive Schedule Notifications', // Channel name
-      channelDescription: 'Notifications for upcoming drives',
-      importance: Importance.max,
-      priority: Priority.high,
-      ticker: 'ticker',
-      sound: RawResourceAndroidNotificationSound('alarm_sound'),
-    );
-    const NotificationDetails notificationDetails =
-        NotificationDetails(
-            android: androidNotificationDetails,
-            iOS: DarwinNotificationDetails(sound: 'alarm_sound.mp3'),
-        );
-
-    await flutterLocalNotificationsPlugin.zonedSchedule(
-      notificationId,
-      'Upcoming Drive Reminder',
-      'Drive for ${entry.customerName} on ${entry.dateTime.toLocal().toString().substring(0, 10)} at ${entry.dateTime.toLocal().toString().substring(11, 16)}. Pickup: ${entry.source} to Drop: ${entry.destination}.',
-      scheduledTime,
-      notificationDetails,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-      uiLocalNotificationDateInterpretation: UILocalNotificationDateInterpretation.absoluteTime,
-      payload: 'drive_entry_id_${entry.id}',
-    );
-    print('Scheduled notification ID $notificationId for entry ${entry.id} at $scheduledTime');
-  }
-
-  Future<void> cancelNotification(String entryIdString) async {
-    final int? notificationId = int.tryParse(entryIdString);
-    if (notificationId != null) {
-      await flutterLocalNotificationsPlugin.cancel(notificationId);
-      print('Cancelled notification for entry ID $notificationId');
-    } else {
-      print('Error: Could not parse entryIdString to int for cancellation: $entryIdString');
-    }
-  }
 
   Future<void> showAppOpenNotification() async {
     const AndroidNotificationDetails androidNotificationDetails =
