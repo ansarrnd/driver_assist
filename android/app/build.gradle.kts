@@ -69,6 +69,6 @@ flutter {
 
 dependencies {
     implementation(kotlin("stdlib-jdk7"))
-    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.0.4")
+    coreLibraryDesugaring("com.android.tools:desugar_jdk_libs:2.1.5")
     implementation("androidx.core:core-ktx:1.9.0") // Align with flutter_local_notifications
 }
