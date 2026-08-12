@@ -98,7 +98,7 @@ Test layout:
 | `test/domain/` | Entity, filter, and repository fakes |
 | `test/data/` | `DriveRepositoryImpl` with fake Firestore |
 | `test/presentation/` | BLoC and widget tests |
-| `test/goldens/` | Snapshot/golden tests (`@Tags(['golden'])`) |
+| `test/goldens/` | Snapshot/golden tests |
 | `integration_test/` | End-to-end flows with in-memory repository |
 | `test/helpers/` | `pump_app`, fakes, and shared fixtures |
 
