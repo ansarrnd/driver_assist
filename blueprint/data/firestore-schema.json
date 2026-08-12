@@ -26,15 +26,16 @@
           "enum": ["trip", "ticket"]
         },
         "alarmOffsetMinutes": {
-          "type": "integer",
-          "required": true,
-          "minimum": 0
+          "type": ["integer", "null"],
+          "required": false,
+          "minimum": 0,
+          "description": "Minutes before dateTime to fire reminder; null means no alarm; 0 means at trip time."
         }
       },
       "indexes": [
         {
-          "fields": [{ "field": "dateTime", "order": "ASCENDING" }],
-          "notes": "Primary schedule ordering; client may also sort in memory."
+          "fields": [{ "field": "dateTime", "order": "DESCENDING" }],
+          "notes": "Reference app orders newest/latest first; client may also sort in memory."
         }
       ],
       "securityRulesSketch": [
