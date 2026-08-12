@@ -7,6 +7,7 @@ import '../../../drive/presentation/bloc/drive/drive_bloc.dart';
 import '../../../drive/presentation/bloc/drive/drive_event.dart';
 import '../../../drive/presentation/bloc/drive/drive_state.dart';
 import '../../../drive/domain/entities/drive_entity.dart';
+import '../../../drive/domain/entities/drive_type.dart';
 
 class ManageDriveEntriesPage extends StatelessWidget {
   const ManageDriveEntriesPage({super.key});
@@ -79,8 +80,8 @@ class ManageDriveEntriesPage extends StatelessWidget {
                     ),
                   );
                 } else if (state is DriveLoaded) {
-                  final trips = state.drives.where((e) => e.type == 'trip').toList();
-                  final tickets = state.drives.where((e) => e.type == 'ticket').toList();
+                  final trips = state.drives.where((e) => e.type == DriveType.trip).toList();
+                  final tickets = state.drives.where((e) => e.type == DriveType.ticket).toList();
 
                   return TabBarView(
                     children: [
@@ -228,7 +229,7 @@ class ManageDriveEntriesPage extends StatelessWidget {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                '${entry.type == 'trip' ? 'Pickup' : 'Source'}: ${entry.source}',
+                                '${entry.type == DriveType.trip ? 'Pickup' : 'Source'}: ${entry.source}',
                                 style: Theme.of(context).textTheme.bodyMedium,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,
@@ -243,7 +244,7 @@ class ManageDriveEntriesPage extends StatelessWidget {
                             const SizedBox(width: 8),
                             Expanded(
                               child: Text(
-                                '${entry.type == 'trip' ? 'Drop' : 'Destination'}: ${entry.destination}',
+                                '${entry.type == DriveType.trip ? 'Drop' : 'Destination'}: ${entry.destination}',
                                 style: Theme.of(context).textTheme.bodyMedium,
                                 maxLines: 1,
                                 overflow: TextOverflow.ellipsis,

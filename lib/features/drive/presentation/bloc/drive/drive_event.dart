@@ -8,18 +8,36 @@ abstract class DriveEvent extends Equatable {
   List<Object> get props => [];
 }
 
-class LoadDrivesEvent extends DriveEvent {}
+class LoadDrivesEvent extends DriveEvent {
+  final bool silent;
+
+  const LoadDrivesEvent({this.silent = false});
+
+  @override
+  List<Object> get props => [silent];
+}
 
 class AddDriveEvent extends DriveEvent {
   final DriveEntity drive;
+
   const AddDriveEvent(this.drive);
 
   @override
   List<Object> get props => [drive];
 }
 
+class UpdateDriveEvent extends DriveEvent {
+  final DriveEntity drive;
+
+  const UpdateDriveEvent(this.drive);
+
+  @override
+  List<Object> get props => [drive];
+}
+
 class DeleteDriveEvent extends DriveEvent {
-  final int id;
+  final String id;
+
   const DeleteDriveEvent(this.id);
 
   @override

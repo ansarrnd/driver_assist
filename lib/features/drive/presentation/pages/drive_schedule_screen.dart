@@ -6,11 +6,12 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/entities/drive_entity.dart';
+import '../../domain/entities/drive_type.dart';
 import '../bloc/drive/drive_bloc.dart';
 import '../bloc/drive/drive_state.dart';
 
 class DriveScheduleScreen extends StatefulWidget {
-  final String filterType;
+  final DriveType filterType;
 
   const DriveScheduleScreen({super.key, required this.filterType});
   @override
@@ -152,9 +153,9 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
                                         const SizedBox(height: 8.0),
                                         _buildInfoRow(context, Icons.access_time, 'Date & Time: ${entry.dateTime.toLocal().toString().substring(0, 16)}'),
                                         const SizedBox(height: 4.0),
-                                        _buildInfoRow(context, Icons.location_on_outlined, '${entry.type == 'trip' ? 'Pickup' : 'Source'}: ${entry.source}'),
+                                        _buildInfoRow(context, Icons.location_on_outlined, '${entry.type == DriveType.trip ? 'Pickup' : 'Source'}: ${entry.source}'),
                                         const SizedBox(height: 4.0),
-                                        _buildInfoRow(context, Icons.flag_outlined, '${entry.type == 'trip' ? 'Drop' : 'Destination'}: ${entry.destination}'),
+                                        _buildInfoRow(context, Icons.flag_outlined, '${entry.type == DriveType.trip ? 'Drop' : 'Destination'}: ${entry.destination}'),
                                       ],
                                     ),
                                   ),

@@ -1,5 +1,6 @@
 import 'dart:io';
-import 'dart:typed_data';
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 
 class NotificationService {
@@ -65,13 +66,13 @@ class NotificationService {
         NotificationDetails(android: androidNotificationDetails);
 
     await flutterLocalNotificationsPlugin.show(
-      0, // Static ID for this type of notification
+      0,
       'Welcome Back!',
       'Thanks for opening the Driver Schedule app.',
       notificationDetails,
       payload: 'app_open_payload',
     );
-    print('App open notification shown.');
+    debugPrint('App open notification shown.');
   }
 }
 

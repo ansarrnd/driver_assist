@@ -1,12 +1,12 @@
 import 'package:alarm/alarm.dart';
+import 'package:flutter/foundation.dart';
+
 import '../features/drive/domain/entities/drive_entity.dart';
 
 class AlarmService {
   static final AlarmService _instance = AlarmService._internal();
 
-  factory AlarmService() {
-    return _instance;
-  }
+  factory AlarmService() => _instance;
 
   AlarmService._internal();
 
@@ -14,24 +14,27 @@ class AlarmService {
     await Alarm.init();
   }
 
+  int alarmIdForEntry(String entryId) => entryId.hashCode & 0x7FFFFFFF;
+
   Future<void> scheduleDriveAlarm(DriveEntity entry) async {
     if (entry.id == null) {
-      print('Error: DriveEntry ID is null. Cannot schedule alarm.');
+      debugPrint('Cannot schedule alarm: drive entry id is null.');
       return;
     }
 
-    final int alarmId = entry.id ?? entry.hashCode;
+    final alarmId = alarmIdForEntry(entry.id!);
 
     if (entry.alarmOffsetMinutes == null) {
-      print('Alarm offset is null. Cancelling alarm if exists for entry ${entry.id}.');
       await Alarm.stop(alarmId);
       return;
     }
 
-    final DateTime scheduledTime = entry.dateTime.subtract(Duration(minutes: entry.alarmOffsetMinutes!));
+    final scheduledTime = entry.dateTime.subtract(
+      Duration(minutes: entry.alarmOffsetMinutes!),
+    );
 
     if (scheduledTime.isBefore(DateTime.now())) {
-      print('Alarm time for entry ${entry.id} is in the past. Not scheduling.');
+      await Alarm.stop(alarmId);
       return;
     }
 
@@ -54,16 +57,15 @@ class AlarmService {
     );
 
     await Alarm.set(alarmSettings: alarmSettings);
-    print('Scheduled alarm ID $alarmId for entry ${entry.id} at $scheduledTime');
   }
 
-  Future<void> cancelAlarm(String entryIdString) async {
-    final int? alarmId = int.tryParse(entryIdString);
-    if (alarmId != null) {
-      await Alarm.stop(alarmId);
-      print('Cancelled alarm for entry ID $alarmId');
-    } else {
-      print('Error: Could not parse entryIdString to int for cancellation: $entryIdString');
+  Future<void> cancelAlarm(String entryId) async {
+    await Alarm.stop(alarmIdForEntry(entryId));
+  }
+
+  Future<void> rescheduleAll(List<DriveEntity> drives) async {
+    for (final drive in drives) {
+      await scheduleDriveAlarm(drive);
     }
   }
 }

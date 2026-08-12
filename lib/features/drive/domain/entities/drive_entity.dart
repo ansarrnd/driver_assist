@@ -1,12 +1,13 @@
 import 'package:equatable/equatable.dart';
+import 'drive_type.dart';
 
 class DriveEntity extends Equatable {
-  final int? id;
+  final String? id;
   final String customerName;
   final String source;
   final String destination;
   final DateTime dateTime;
-  final String type;
+  final DriveType type;
   final int? alarmOffsetMinutes;
 
   const DriveEntity({
@@ -15,42 +16,42 @@ class DriveEntity extends Equatable {
     required this.source,
     required this.destination,
     required this.dateTime,
-    this.type = 'trip',
+    this.type = DriveType.trip,
     this.alarmOffsetMinutes,
   });
 
-  factory DriveEntity.fromJson(Map<String, dynamic> json) {
+  factory DriveEntity.fromFirestore(String id, Map<String, dynamic> data) {
     return DriveEntity(
-      id: json['_id'] as int?,
-      customerName: json['customerName'] as String,
-      source: json['source'] as String,
-      destination: json['destination'] as String,
-      dateTime: DateTime.parse(json['dateTime'] as String),
-      type: json['type'] as String? ?? 'trip',
-      alarmOffsetMinutes: json['alarmOffsetMinutes'] as int?,
+      id: id,
+      customerName: data['customerName'] as String,
+      source: data['source'] as String,
+      destination: data['destination'] as String,
+      dateTime: DateTime.parse(data['dateTime'] as String),
+      type: DriveType.fromString(data['type'] as String? ?? 'trip'),
+      alarmOffsetMinutes: data['alarmOffsetMinutes'] as int?,
     );
   }
 
-  Map<String, dynamic> toJson() {
+  Map<String, dynamic> toFirestore() {
     return {
-      '_id': id,
       'customerName': customerName,
       'source': source,
       'destination': destination,
       'dateTime': dateTime.toIso8601String(),
-      'type': type,
+      'type': type.value,
       'alarmOffsetMinutes': alarmOffsetMinutes,
     };
   }
 
   DriveEntity copyWith({
-    int? id,
+    String? id,
     String? customerName,
     String? source,
     String? destination,
     DateTime? dateTime,
-    String? type,
+    DriveType? type,
     int? alarmOffsetMinutes,
+    bool clearAlarmOffset = false,
   }) {
     return DriveEntity(
       id: id ?? this.id,
@@ -59,7 +60,7 @@ class DriveEntity extends Equatable {
       destination: destination ?? this.destination,
       dateTime: dateTime ?? this.dateTime,
       type: type ?? this.type,
-      alarmOffsetMinutes: alarmOffsetMinutes ?? this.alarmOffsetMinutes,
+      alarmOffsetMinutes: clearAlarmOffset ? null : (alarmOffsetMinutes ?? this.alarmOffsetMinutes),
     );
   }
 

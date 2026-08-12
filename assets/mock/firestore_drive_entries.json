@@ -1,0 +1,50 @@
+[
+  {
+    "customerName": "Rajesh Kumar",
+    "source": "Kempegowda International Airport T1",
+    "destination": "MG Road, Bengaluru",
+    "dateTime": "2026-08-13T06:30:00.000",
+    "type": "trip",
+    "alarmOffsetMinutes": 60
+  },
+  {
+    "customerName": "Priya Sharma",
+    "source": "Indiranagar Metro Station",
+    "destination": "Electronic City Phase 1",
+    "dateTime": "2026-08-14T08:00:00.000",
+    "type": "trip",
+    "alarmOffsetMinutes": 30
+  },
+  {
+    "customerName": "Michael Chen",
+    "source": "Chennai Central Railway Station",
+    "destination": "OMR Sholinganallur",
+    "dateTime": "2026-08-15T17:45:00.000",
+    "type": "ticket",
+    "alarmOffsetMinutes": 1440
+  },
+  {
+    "customerName": "Anita Desai",
+    "source": "Pune Railway Station",
+    "destination": "Hinjewadi IT Park",
+    "dateTime": "2026-08-16T09:15:00.000",
+    "type": "ticket",
+    "alarmOffsetMinutes": 60
+  },
+  {
+    "customerName": "David Wilson",
+    "source": "Hyderabad Airport",
+    "destination": "Gachibowli Financial District",
+    "dateTime": "2026-08-17T22:00:00.000",
+    "type": "trip",
+    "alarmOffsetMinutes": 15
+  },
+  {
+    "customerName": "Sneha Reddy",
+    "source": "Secunderabad Railway Station",
+    "destination": "Banjara Hills",
+    "dateTime": "2026-08-18T07:00:00.000",
+    "type": "ticket",
+    "alarmOffsetMinutes": null
+  }
+]
