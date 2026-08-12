@@ -4,10 +4,8 @@ import '../entities/drive_type.dart';
 enum DriveSchedulePeriod {
   today,
   week,
-  month,
-}
+  month;
 
-extension DriveSchedulePeriodLabel on DriveSchedulePeriod {
   String get label {
     switch (this) {
       case DriveSchedulePeriod.today:

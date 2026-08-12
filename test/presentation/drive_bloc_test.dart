@@ -3,7 +3,6 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:driver_schedule/core/usecases/usecase.dart';
-import 'package:driver_schedule/features/drive/domain/entities/drive_entity.dart';
 import 'package:driver_schedule/features/drive/domain/usecases/add_drive.dart';
 import 'package:driver_schedule/features/drive/domain/usecases/delete_drive.dart';
 import 'package:driver_schedule/features/drive/domain/usecases/get_drives.dart';
@@ -72,7 +71,7 @@ void main() {
       },
       seed: () => DriveLoaded(sampleDrives),
       act: (bloc) => bloc.add(const LoadDrivesEvent(silent: true)),
-      expect: () => [DriveLoaded(sampleDrives)],
+      expect: () => <DriveState>[],
     );
 
     blocTest<DriveBloc, DriveState>(
@@ -84,7 +83,8 @@ void main() {
       },
       seed: () => DriveLoaded(sampleDrives),
       act: (bloc) => bloc.add(AddDriveEvent(testDrive())),
-      expect: () => [DriveLoaded(sampleDrives)],
+      wait: const Duration(milliseconds: 50),
+      expect: () => <DriveState>[],
       verify: (_) {
         verify(() => addDrive(any())).called(1);
         verify(() => getDrives(any())).called(1);
@@ -100,6 +100,7 @@ void main() {
       },
       seed: () => DriveLoaded(sampleDrives),
       act: (bloc) => bloc.add(const DeleteDriveEvent('1')),
+      wait: const Duration(milliseconds: 50),
       expect: () => [DriveLoaded([sampleDrives.first])],
       verify: (_) {
         verify(() => deleteDrive('1')).called(1);

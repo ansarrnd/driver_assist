@@ -1,8 +1,6 @@
 import 'package:bloc_test/bloc_test.dart';
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
-import 'package:driver_schedule/core/theme/theme.dart';
 import 'package:driver_schedule/features/drive/domain/entities/drive_type.dart';
 import 'package:driver_schedule/features/drive/presentation/bloc/drive/drive_bloc.dart';
 import 'package:driver_schedule/features/drive/presentation/bloc/drive/drive_event.dart';
@@ -13,7 +11,6 @@ import '../helpers/pump_app.dart';
 
 class MockDriveBloc extends MockBloc<DriveEvent, DriveState> implements DriveBloc {}
 
-@Tags(['golden'])
 void main() {
   setUpAll(() async {
     await configureTestEnvironment();
@@ -34,7 +31,7 @@ void main() {
       tester,
       const DriveScheduleScreen(filterType: DriveType.trip),
       driveBloc: bloc,
-      theme: AppTheme.rcbTheme,
+      theme: testTheme(),
     );
     await tester.pumpAndSettle();
 

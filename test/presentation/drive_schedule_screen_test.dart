@@ -1,6 +1,5 @@
 import 'package:bloc_test/bloc_test.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:mocktail/mocktail.dart';
 
 import 'package:driver_schedule/features/drive/domain/entities/drive_type.dart';
 import 'package:driver_schedule/features/drive/presentation/bloc/drive/drive_bloc.dart';
@@ -32,13 +31,18 @@ void main() {
         const DriveScheduleScreen(filterType: DriveType.trip),
         driveBloc: bloc,
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('No drive schedules available.'), findsOneWidget);
     });
 
     testWidgets('renders drive cards for loaded state', (tester) async {
       final drives = [
-        testDrive(id: '1', customerName: 'Alice', dateTime: DateTime(2026, 8, 12, 10)),
+        testDrive(
+          id: '1',
+          customerName: 'Alice',
+          dateTime: DateTime(DateTime.now().year, DateTime.now().month, 12, 10),
+        ),
       ];
       final bloc = MockDriveBloc();
       whenListen(
@@ -52,6 +56,7 @@ void main() {
         const DriveScheduleScreen(filterType: DriveType.trip),
         driveBloc: bloc,
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('Alice'), findsOneWidget);
       expect(find.textContaining('Pickup: Pickup Point'), findsOneWidget);
@@ -70,6 +75,7 @@ void main() {
         const DriveScheduleScreen(filterType: DriveType.trip),
         driveBloc: bloc,
       );
+      await tester.pumpAndSettle();
 
       expect(find.text('Error: boom'), findsOneWidget);
     });

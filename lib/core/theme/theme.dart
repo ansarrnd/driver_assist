@@ -31,6 +31,15 @@ class AppTheme {
   static const double defaultOpacity = 0.1;
   static final BorderRadius defaultBorderRadius = BorderRadius.circular(10.0);
 
+  static ThemeData get fallbackTheme => ThemeData(
+        useMaterial3: true,
+        brightness: Brightness.dark,
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: const Color(0xFFE50E2F),
+          brightness: Brightness.dark,
+        ),
+      );
+
   // Helper method to build themes for IPL teams
   static ThemeData _buildTeamTheme({
     required Color seedColor,
@@ -50,7 +59,9 @@ class AppTheme {
       colorScheme: colorScheme,
       useMaterial3: true,
       scaffoldBackgroundColor: Colors.transparent,
-      textTheme: GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme),
+      textTheme: GoogleFonts.config.allowRuntimeFetching
+          ? GoogleFonts.outfitTextTheme(ThemeData.dark().textTheme)
+          : ThemeData.dark().textTheme,
       extensions: [
         AppThemeExtension(backgroundDecoration: backgroundDecoration),
       ],

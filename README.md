@@ -71,8 +71,8 @@ Alarm scheduling is handled in the repository layer (not the UI), including resc
 # Unit + widget tests
 flutter test --exclude-tags golden
 
-# Golden/snapshot tests (generate baselines locally first)
-flutter test --tags golden --update-goldens
+# Golden/snapshot tests (baselines committed under test/goldens/)
+flutter test test/goldens
 
 # Integration tests (device/emulator required)
 flutter test integration_test

@@ -229,6 +229,7 @@ class AddDriveEntryPage extends HookWidget {
                 ),
                 const SizedBox(height: 16.0),
                 DropdownButtonFormField<int?>(
+                  isExpanded: true,
                   decoration: const InputDecoration(labelText: 'Set Reminder Alarm'),
                   value: selectedAlarmOffset.value,
                   onChanged: (newValue) {

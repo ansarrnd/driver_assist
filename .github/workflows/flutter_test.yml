@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  test:
+  unit-and-widget:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -24,4 +24,26 @@ jobs:
         run: flutter analyze
 
       - name: Run unit and widget tests
-        run: flutter test --exclude-tags golden
+        run: flutter test test/presentation test/domain test/data --coverage
+
+      - name: Upload coverage
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-lcov
+          path: coverage/lcov.info
+
+  golden:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: stable
+          cache: true
+
+      - name: Install dependencies
+        run: flutter pub get
+
+      - name: Run golden tests
+        run: flutter test test/goldens
