@@ -1,0 +1,59 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "easydryve.drive_entries",
+  "title": "EasyDryve Firestore Schema",
+  "description": "Collection and document shapes for Cloud Firestore backend.",
+  "collections": {
+    "drive_entries": {
+      "path": "drive_entries",
+      "documentId": {
+        "type": "string",
+        "description": "Auto-generated Firestore document id; treated as opaque string in the app."
+      },
+      "fields": {
+        "customerName": { "type": "string", "required": true },
+        "source": { "type": "string", "required": true },
+        "destination": { "type": "string", "required": true },
+        "dateTime": {
+          "type": "string",
+          "format": "date-time",
+          "required": true,
+          "description": "ISO-8601 datetime string (reference app); ports may use native Timestamp if mapped consistently."
+        },
+        "type": {
+          "type": "string",
+          "required": true,
+          "enum": ["trip", "ticket"]
+        },
+        "alarmOffsetMinutes": {
+          "type": ["integer", "null"],
+          "required": false,
+          "minimum": 0,
+          "description": "Minutes before dateTime to fire reminder; null means no alarm; 0 means at trip time."
+        }
+      },
+      "indexes": [
+        {
+          "fields": [{ "field": "dateTime", "order": "DESCENDING" }],
+          "notes": "Reference app orders newest/latest first; client may also sort in memory."
+        }
+      ],
+      "securityRulesSketch": [
+        "match /drive_entries/{id} {",
+        "  allow read, write: if request.auth != null;",
+        "  // Tighten to ownerUid == request.auth.uid when multi-user is added.",
+        "}"
+      ]
+    }
+  },
+  "seedBehavior": {
+    "when": "collection is empty on first repository load",
+    "source": "assets/mock/firestore_drive_entries.json",
+    "idempotent": true
+  },
+  "emulator": {
+    "env": "FIRESTORE_EMULATOR_HOST",
+    "default": "127.0.0.1:8080",
+    "configFile": "firebase.json"
+  }
+}

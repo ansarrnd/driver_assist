@@ -45,3 +45,6 @@ app.*.map.json
 /android/app/release
 .flutter-sdk/
 coverage/
+
+# Local CI artifacts
+.ci-artifacts/

@@ -13,12 +13,19 @@ This project uses GitHub Actions for continuous integration and release builds.
 ## Local equivalents
 
 ```bash
+# Enterprise local runner (Linux + macOS) — preferred
+./tool/ci_local.sh
+make ci
+
+# Or individual steps
 dart format --output=none --set-exit-if-changed lib test integration_test tool
-flutter analyze
+flutter analyze --no-fatal-infos
 bash tool/check_coverage.sh
 flutter test test/goldens
 flutter build apk --debug
 ```
+
+Full guide: [LOCAL_CI.md](LOCAL_CI.md).
 
 ## Required / optional secrets
 
