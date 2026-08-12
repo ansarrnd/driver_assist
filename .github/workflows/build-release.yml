@@ -72,7 +72,7 @@ jobs:
 
       - name: Upload APK
         if: ${{ github.event_name == 'push' || inputs.build_type == 'apk' || inputs.build_type == 'both' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: app-release-apk
           path: build/app/outputs/flutter-apk/app-release.apk
@@ -80,7 +80,7 @@ jobs:
 
       - name: Upload AAB
         if: ${{ github.event_name == 'push' || inputs.build_type == 'appbundle' || inputs.build_type == 'both' }}
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: app-release-aab
           path: build/app/outputs/bundle/release/app-release.aab
