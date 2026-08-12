@@ -5,7 +5,7 @@ import '../../../../services/alarm_service.dart';
 
 class DriveRepositoryImpl implements DriveRepository {
   final DriveFirestoreDataSource firestoreDataSource;
-  final AlarmService alarmService;
+  final AlarmScheduler alarmService;
 
   DriveRepositoryImpl({
     required this.firestoreDataSource,

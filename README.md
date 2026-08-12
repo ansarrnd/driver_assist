@@ -64,3 +64,29 @@ Clean architecture with BLoC:
 - **Services**: alarms and notifications
 
 Alarm scheduling is handled in the repository layer (not the UI), including reschedule on app startup and cancel on delete.
+
+## Testing
+
+```bash
+# Unit + widget tests
+flutter test --exclude-tags golden
+
+# Golden/snapshot tests (generate baselines locally first)
+flutter test --tags golden --update-goldens
+
+# Integration tests (device/emulator required)
+flutter test integration_test
+```
+
+Test layout:
+
+| Directory | Purpose |
+|-----------|---------|
+| `test/domain/` | Entity, filter, and repository fakes |
+| `test/data/` | `DriveRepositoryImpl` with fake Firestore |
+| `test/presentation/` | BLoC and widget tests |
+| `test/goldens/` | Snapshot/golden tests (`@Tags(['golden'])`) |
+| `integration_test/` | End-to-end flows with in-memory repository |
+| `test/helpers/` | `pump_app`, fakes, and shared fixtures |
+
+Integration and widget tests use `initForTesting()` / `AppBootstrapConfig.testing()` to avoid Firebase and native alarm initialization.

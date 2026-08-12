@@ -3,7 +3,13 @@ import 'package:flutter/foundation.dart';
 
 import '../features/drive/domain/entities/drive_entity.dart';
 
-class AlarmService {
+abstract class AlarmScheduler {
+  Future<void> scheduleDriveAlarm(DriveEntity entry);
+  Future<void> cancelAlarm(String entryId);
+  Future<void> rescheduleAll(List<DriveEntity> drives);
+}
+
+class AlarmService implements AlarmScheduler {
   static final AlarmService _instance = AlarmService._internal();
 
   factory AlarmService() => _instance;
@@ -16,6 +22,7 @@ class AlarmService {
 
   int alarmIdForEntry(String entryId) => entryId.hashCode & 0x7FFFFFFF;
 
+  @override
   Future<void> scheduleDriveAlarm(DriveEntity entry) async {
     if (entry.id == null) {
       debugPrint('Cannot schedule alarm: drive entry id is null.');
@@ -59,10 +66,12 @@ class AlarmService {
     await Alarm.set(alarmSettings: alarmSettings);
   }
 
+  @override
   Future<void> cancelAlarm(String entryId) async {
     await Alarm.stop(alarmIdForEntry(entryId));
   }
 
+  @override
   Future<void> rescheduleAll(List<DriveEntity> drives) async {
     for (final drive in drives) {
       await scheduleDriveAlarm(drive);

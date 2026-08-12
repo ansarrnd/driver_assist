@@ -19,7 +19,33 @@ final sl = GetIt.instance;
 
 Future<void> init() async {
   await FirebaseInitializer.initialize();
+  await _registerDependencies();
+}
 
+Future<void> initForTesting({
+  DriveRepository? driveRepository,
+  DriveFirestoreDataSource? firestoreDataSource,
+  AlarmScheduler? alarmServiceOverride,
+  FlutterSecureStorage? secureStorage,
+}) async {
+  if (sl.isRegistered<DriveRepository>() || sl.isRegistered<ThemeBloc>()) {
+    await sl.reset();
+  }
+
+  await _registerDependencies(
+    driveRepository: driveRepository,
+    firestoreDataSource: firestoreDataSource,
+    alarmServiceOverride: alarmServiceOverride,
+    secureStorage: secureStorage,
+  );
+}
+
+Future<void> _registerDependencies({
+  DriveRepository? driveRepository,
+  DriveFirestoreDataSource? firestoreDataSource,
+  AlarmScheduler? alarmServiceOverride,
+  FlutterSecureStorage? secureStorage,
+}) async {
   sl.registerFactory(() => ThemeBloc(sl()));
 
   sl.registerFactory(
@@ -37,20 +63,38 @@ Future<void> init() async {
   sl.registerLazySingleton(() => DeleteDrive(sl()));
   sl.registerLazySingleton(() => RescheduleAlarms(sl()));
 
-  sl.registerLazySingleton<DriveRepository>(
-    () => DriveRepositoryImpl(
-      firestoreDataSource: sl(),
-      alarmService: sl(),
-    ),
-  );
+  if (!sl.isRegistered<AlarmScheduler>()) {
+    sl.registerLazySingleton<AlarmScheduler>(
+      () => alarmServiceOverride ?? alarmService,
+    );
+  }
 
-  sl.registerLazySingleton<DriveFirestoreDataSource>(
-    () => DriveFirestoreDataSourceImpl(sl()),
-  );
+  if (firestoreDataSource != null) {
+    sl.registerLazySingleton<DriveFirestoreDataSource>(() => firestoreDataSource);
+  } else if (!sl.isRegistered<DriveFirestoreDataSource>()) {
+    sl.registerLazySingleton<DriveFirestoreDataSource>(
+      () => DriveFirestoreDataSourceImpl(sl()),
+    );
+  }
 
-  sl.registerLazySingleton(() => alarmService);
-  sl.registerLazySingleton(() => FirebaseFirestore.instance);
-  sl.registerLazySingleton(() => const FlutterSecureStorage());
+  if (!sl.isRegistered<FirebaseFirestore>()) {
+    sl.registerLazySingleton(() => FirebaseFirestore.instance);
+  }
+
+  if (driveRepository != null) {
+    sl.registerLazySingleton<DriveRepository>(() => driveRepository);
+  } else {
+    sl.registerLazySingleton<DriveRepository>(
+      () => DriveRepositoryImpl(
+        firestoreDataSource: sl(),
+        alarmService: sl(),
+      ),
+    );
+  }
+
+  sl.registerLazySingleton<FlutterSecureStorage>(
+    () => secureStorage ?? const FlutterSecureStorage(),
+  );
 }
 
 Future<void> bootstrapData() async {

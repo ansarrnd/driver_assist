@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/entities/drive_entity.dart';
 import '../../domain/entities/drive_type.dart';
+import '../../domain/utils/drive_schedule_filter.dart';
 import '../bloc/drive/drive_bloc.dart';
 import '../bloc/drive/drive_state.dart';
 
@@ -23,29 +24,11 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
   String _selectedFilter = 'Month';
 
   List<DriveEntity> _getFilteredEntries(List<DriveEntity> allEntries) {
-    final typeFilteredEntries = allEntries.where((e) => e.type == widget.filterType).toList();
-
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
-    if (_selectedFilter == 'Today') {
-      return typeFilteredEntries.where((entry) {
-        final entryDate = DateTime(entry.dateTime.year, entry.dateTime.month, entry.dateTime.day);
-        return entryDate.isAtSameMomentAs(today);
-      }).toList();
-    } else if (_selectedFilter == 'Week') {
-      final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
-      final endOfWeek = startOfWeek.add(const Duration(days: 6));
-      return typeFilteredEntries.where((entry) {
-        final entryDate = DateTime(entry.dateTime.year, entry.dateTime.month, entry.dateTime.day);
-        return !entryDate.isBefore(startOfWeek) && !entryDate.isAfter(endOfWeek);
-      }).toList();
-    } else if (_selectedFilter == 'Month') {
-      return typeFilteredEntries.where((entry) {
-        return entry.dateTime.year == now.year && entry.dateTime.month == now.month;
-      }).toList();
-    }
-    return typeFilteredEntries;
+    return filterDriveEntries(
+      entries: allEntries,
+      type: widget.filterType,
+      period: DriveSchedulePeriod.fromLabel(_selectedFilter),
+    );
   }
 
   @override
