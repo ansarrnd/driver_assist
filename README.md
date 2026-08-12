@@ -67,6 +67,18 @@ flutter pub get
 flutter run
 ```
 
+## Local CI (enterprise gate)
+
+Run anytime on Linux or macOS before pushing:
+
+```bash
+./tool/ci_local.sh          # standard gate
+make ci                     # same
+make ci-full                # + builds + integration if device available
+```
+
+See [docs/LOCAL_CI.md](docs/LOCAL_CI.md) for profiles, artifacts, and prerequisites.
+
 ## Architecture
 
 Clean architecture with BLoC:
