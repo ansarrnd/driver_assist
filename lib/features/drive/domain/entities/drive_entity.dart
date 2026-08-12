@@ -60,10 +60,20 @@ class DriveEntity extends Equatable {
       destination: destination ?? this.destination,
       dateTime: dateTime ?? this.dateTime,
       type: type ?? this.type,
-      alarmOffsetMinutes: clearAlarmOffset ? null : (alarmOffsetMinutes ?? this.alarmOffsetMinutes),
+      alarmOffsetMinutes: clearAlarmOffset
+          ? null
+          : (alarmOffsetMinutes ?? this.alarmOffsetMinutes),
     );
   }
 
   @override
-  List<Object?> get props => [id, customerName, source, destination, dateTime, type, alarmOffsetMinutes];
+  List<Object?> get props => [
+    id,
+    customerName,
+    source,
+    destination,
+    dateTime,
+    type,
+    alarmOffsetMinutes,
+  ];
 }

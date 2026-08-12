@@ -41,11 +41,24 @@ Mock seed data lives in `assets/mock/firestore_drive_entries.json` and is writte
 
 ### Local development with emulator
 
-Uncomment the emulator line in `lib/core/firebase/firebase_initializer.dart` and run:
+Start the Firestore emulator:
 
 ```bash
 firebase emulators:start --only firestore
 ```
+
+Run the app against the emulator:
+
+```bash
+# Option 1: environment variable (recommended)
+export FIRESTORE_EMULATOR_HOST=localhost:8080
+flutter run
+
+# Option 2: bootstrap config
+# Use AppBootstrapConfig.emulator() in a custom entrypoint
+```
+
+`firebase.json` is included with Firestore on port `8080`.
 
 ## Getting started
 
@@ -64,3 +77,42 @@ Clean architecture with BLoC:
 - **Services**: alarms and notifications
 
 Alarm scheduling is handled in the repository layer (not the UI), including reschedule on app startup and cancel on delete.
+
+## Testing
+
+```bash
+# Unit + widget tests with coverage gate (default 35%)
+bash tool/check_coverage.sh
+
+# Golden/snapshot tests (baselines committed under test/goldens/)
+flutter test test/goldens
+
+# Integration tests (device/emulator required)
+flutter test integration_test
+```
+
+Test layout:
+
+| Directory | Purpose |
+|-----------|---------|
+| `test/domain/` | Entity, filter, and repository fakes |
+| `test/data/` | `DriveRepositoryImpl` with fake Firestore |
+| `test/presentation/` | BLoC and widget tests |
+| `test/goldens/` | Snapshot/golden tests |
+| `integration_test/` | End-to-end flows with in-memory repository |
+| `test/helpers/` | `pump_app`, fakes, and shared fixtures |
+
+Integration and widget tests use `initForTesting()` / `AppBootstrapConfig.testing()` to avoid Firebase and native alarm initialization.
+
+## CI / CD
+
+GitHub Actions run on every PR and push to `main`:
+
+- **Analyze** — format + `flutter analyze`
+- **Unit & widget tests** — coverage gate (`tool/check_coverage.sh`, min 35%)
+- **Golden tests** — snapshot baselines under `test/goldens/`
+- **Debug APK** — compile verification artifact
+
+Tag a release with `v*` (e.g. `v1.1.0`) to build release APK/AAB and create a GitHub Release.
+
+See [docs/CI_CD.md](docs/CI_CD.md) for secrets, branch protection, and recommended next inclusions (emulator tests, Codecov, iOS/Web builds, Play upload, etc.).

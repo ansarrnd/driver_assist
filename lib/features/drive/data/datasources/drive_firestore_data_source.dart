@@ -21,7 +21,9 @@ class DriveFirestoreDataSourceImpl implements DriveFirestoreDataSource {
 
   @override
   Future<List<DriveEntity>> getDrives() async {
-    final snapshot = await _collection.orderBy('dateTime', descending: true).get();
+    final snapshot = await _collection
+        .orderBy('dateTime', descending: true)
+        .get();
     return snapshot.docs
         .map((doc) => DriveEntity.fromFirestore(doc.id, doc.data()))
         .toList();

@@ -26,7 +26,10 @@ class DriveBloc extends Bloc<DriveEvent, DriveState> {
     on<DeleteDriveEvent>(_onDeleteDrive);
   }
 
-  Future<void> _onLoadDrives(LoadDrivesEvent event, Emitter<DriveState> emit) async {
+  Future<void> _onLoadDrives(
+    LoadDrivesEvent event,
+    Emitter<DriveState> emit,
+  ) async {
     if (!event.silent || state is! DriveLoaded) {
       emit(DriveLoading());
     }
@@ -39,7 +42,10 @@ class DriveBloc extends Bloc<DriveEvent, DriveState> {
     }
   }
 
-  Future<void> _onAddDrive(AddDriveEvent event, Emitter<DriveState> emit) async {
+  Future<void> _onAddDrive(
+    AddDriveEvent event,
+    Emitter<DriveState> emit,
+  ) async {
     try {
       await addDrive(event.drive);
       add(const LoadDrivesEvent(silent: true));
@@ -48,7 +54,10 @@ class DriveBloc extends Bloc<DriveEvent, DriveState> {
     }
   }
 
-  Future<void> _onUpdateDrive(UpdateDriveEvent event, Emitter<DriveState> emit) async {
+  Future<void> _onUpdateDrive(
+    UpdateDriveEvent event,
+    Emitter<DriveState> emit,
+  ) async {
     try {
       await updateDrive(event.drive);
       add(const LoadDrivesEvent(silent: true));
@@ -57,7 +66,10 @@ class DriveBloc extends Bloc<DriveEvent, DriveState> {
     }
   }
 
-  Future<void> _onDeleteDrive(DeleteDriveEvent event, Emitter<DriveState> emit) async {
+  Future<void> _onDeleteDrive(
+    DeleteDriveEvent event,
+    Emitter<DriveState> emit,
+  ) async {
     try {
       await deleteDrive(event.id);
       add(const LoadDrivesEvent(silent: true));

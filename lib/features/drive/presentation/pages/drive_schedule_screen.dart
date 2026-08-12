@@ -7,6 +7,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/theme/theme.dart';
 import '../../domain/entities/drive_entity.dart';
 import '../../domain/entities/drive_type.dart';
+import '../../domain/utils/drive_schedule_filter.dart';
 import '../bloc/drive/drive_bloc.dart';
 import '../bloc/drive/drive_state.dart';
 
@@ -23,29 +24,11 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
   String _selectedFilter = 'Month';
 
   List<DriveEntity> _getFilteredEntries(List<DriveEntity> allEntries) {
-    final typeFilteredEntries = allEntries.where((e) => e.type == widget.filterType).toList();
-
-    final now = DateTime.now();
-    final today = DateTime(now.year, now.month, now.day);
-
-    if (_selectedFilter == 'Today') {
-      return typeFilteredEntries.where((entry) {
-        final entryDate = DateTime(entry.dateTime.year, entry.dateTime.month, entry.dateTime.day);
-        return entryDate.isAtSameMomentAs(today);
-      }).toList();
-    } else if (_selectedFilter == 'Week') {
-      final startOfWeek = today.subtract(Duration(days: today.weekday - 1));
-      final endOfWeek = startOfWeek.add(const Duration(days: 6));
-      return typeFilteredEntries.where((entry) {
-        final entryDate = DateTime(entry.dateTime.year, entry.dateTime.month, entry.dateTime.day);
-        return !entryDate.isBefore(startOfWeek) && !entryDate.isAfter(endOfWeek);
-      }).toList();
-    } else if (_selectedFilter == 'Month') {
-      return typeFilteredEntries.where((entry) {
-        return entry.dateTime.year == now.year && entry.dateTime.month == now.month;
-      }).toList();
-    }
-    return typeFilteredEntries;
+    return filterDriveEntries(
+      entries: allEntries,
+      type: widget.filterType,
+      period: DriveSchedulePeriod.fromLabel(_selectedFilter),
+    );
   }
 
   @override
@@ -63,10 +46,7 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
               ),
             ),
             items: _filterOptions.map((String value) {
-              return DropdownMenuItem<String>(
-                value: value,
-                child: Text(value),
-              );
+              return DropdownMenuItem<String>(value: value, child: Text(value));
             }).toList(),
             onChanged: (String? newValue) {
               if (newValue != null) {
@@ -93,11 +73,18 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Icon(Icons.directions_car_outlined, size: 64, color: Colors.white.withOpacity(0.5)),
+                        Icon(
+                          Icons.directions_car_outlined,
+                          size: 64,
+                          color: Colors.white.withOpacity(0.5),
+                        ),
                         const SizedBox(height: 16),
                         Text(
                           'No drive schedules available.',
-                          style: TextStyle(fontSize: 18, color: Colors.white.withOpacity(0.7)),
+                          style: TextStyle(
+                            fontSize: 18,
+                            color: Colors.white.withOpacity(0.7),
+                          ),
                         ),
                       ],
                     ),
@@ -122,7 +109,10 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
                                 context.push('/edit-drive', extra: entry);
                               },
                               child: Padding(
-                                padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 8.0,
+                                  horizontal: 4.0,
+                                ),
                                 child: LiquidGlassContainer(
                                   blur: AppTheme.defaultBlur,
                                   opacity: AppTheme.defaultOpacity,
@@ -130,32 +120,64 @@ class _DriveScheduleScreenState extends State<DriveScheduleScreen> {
                                   child: Padding(
                                     padding: const EdgeInsets.all(16.0),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: <Widget>[
                                         Row(
-                                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.spaceBetween,
                                           children: [
                                             Text(
                                               entry.customerName,
-                                              style: Theme.of(context).textTheme.titleLarge?.copyWith(fontWeight: FontWeight.bold),
+                                              style: Theme.of(context)
+                                                  .textTheme
+                                                  .titleLarge
+                                                  ?.copyWith(
+                                                    fontWeight: FontWeight.bold,
+                                                  ),
                                             ),
                                             Row(
                                               children: [
-                                                if (entry.alarmOffsetMinutes != null) ...[
-                                                  Icon(Icons.notifications_active, color: Theme.of(context).colorScheme.secondary, size: 20),
+                                                if (entry.alarmOffsetMinutes !=
+                                                    null) ...[
+                                                  Icon(
+                                                    Icons.notifications_active,
+                                                    color: Theme.of(
+                                                      context,
+                                                    ).colorScheme.secondary,
+                                                    size: 20,
+                                                  ),
                                                   const SizedBox(width: 8),
                                                 ],
-                                                Icon(Icons.edit, color: Theme.of(context).colorScheme.onSurfaceVariant, size: 20),
+                                                Icon(
+                                                  Icons.edit,
+                                                  color: Theme.of(context)
+                                                      .colorScheme
+                                                      .onSurfaceVariant,
+                                                  size: 20,
+                                                ),
                                               ],
                                             ),
                                           ],
                                         ),
                                         const SizedBox(height: 8.0),
-                                        _buildInfoRow(context, Icons.access_time, 'Date & Time: ${entry.dateTime.toLocal().toString().substring(0, 16)}'),
+                                        _buildInfoRow(
+                                          context,
+                                          Icons.access_time,
+                                          'Date & Time: ${entry.dateTime.toLocal().toString().substring(0, 16)}',
+                                        ),
                                         const SizedBox(height: 4.0),
-                                        _buildInfoRow(context, Icons.location_on_outlined, '${entry.type == DriveType.trip ? 'Pickup' : 'Source'}: ${entry.source}'),
+                                        _buildInfoRow(
+                                          context,
+                                          Icons.location_on_outlined,
+                                          '${entry.type == DriveType.trip ? 'Pickup' : 'Source'}: ${entry.source}',
+                                        ),
                                         const SizedBox(height: 4.0),
-                                        _buildInfoRow(context, Icons.flag_outlined, '${entry.type == DriveType.trip ? 'Drop' : 'Destination'}: ${entry.destination}'),
+                                        _buildInfoRow(
+                                          context,
+                                          Icons.flag_outlined,
+                                          '${entry.type == DriveType.trip ? 'Drop' : 'Destination'}: ${entry.destination}',
+                                        ),
                                       ],
                                     ),
                                   ),

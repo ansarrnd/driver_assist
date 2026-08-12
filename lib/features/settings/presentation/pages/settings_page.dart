@@ -10,9 +10,7 @@ class SettingsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: const Text('Settings'),
-      ),
+      appBar: AppBar(title: const Text('Settings')),
       body: ListView(
         padding: const EdgeInsets.all(16.0),
         children: [
@@ -27,7 +25,9 @@ class SettingsPage extends StatelessWidget {
                 child: ListTile(
                   leading: const Icon(Icons.color_lens_outlined),
                   title: const Text('App Theme'),
-                  subtitle: const Text('Change the visual style of the application'),
+                  subtitle: const Text(
+                    'Change the visual style of the application',
+                  ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.push(
@@ -52,7 +52,9 @@ class SettingsPage extends StatelessWidget {
                 child: ListTile(
                   leading: const Icon(Icons.storage_outlined),
                   title: const Text('Manage Drive Entries'),
-                  subtitle: const Text('View and delete your saved drive history'),
+                  subtitle: const Text(
+                    'View and delete your saved drive history',
+                  ),
                   trailing: const Icon(Icons.chevron_right),
                   onTap: () {
                     Navigator.push(

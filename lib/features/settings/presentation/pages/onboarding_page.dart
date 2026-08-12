@@ -59,19 +59,22 @@ class _OnboardingPageState extends State<OnboardingPage> {
                       context,
                       icon: Icons.calendar_view_month,
                       title: 'Schedule & Filter',
-                      description: 'Easily manage your Trips and Tickets in one unified schedule.',
+                      description:
+                          'Easily manage your Trips and Tickets in one unified schedule.',
                     ),
                     _buildPage(
                       context,
                       icon: Icons.notifications_active_outlined,
                       title: 'Smart Reminders',
-                      description: 'Set up custom alarms and notifications so you are never late for a pickup.',
+                      description:
+                          'Set up custom alarms and notifications so you are never late for a pickup.',
                     ),
                     _buildPage(
                       context,
                       icon: Icons.swipe_left_outlined,
                       title: 'Easy Management',
-                      description: 'Tap an entry to edit its details, or simply swipe left to delete it.',
+                      description:
+                          'Tap an entry to edit its details, or simply swipe left to delete it.',
                     ),
                   ],
                 ),
@@ -92,7 +95,9 @@ class _OnboardingPageState extends State<OnboardingPage> {
                           decoration: BoxDecoration(
                             color: _currentPage == index
                                 ? Theme.of(context).colorScheme.primary
-                                : Theme.of(context).colorScheme.primary.withOpacity(0.3),
+                                : Theme.of(
+                                    context,
+                                  ).colorScheme.primary.withOpacity(0.3),
                             borderRadius: BorderRadius.circular(4),
                           ),
                         ),
@@ -122,7 +127,12 @@ class _OnboardingPageState extends State<OnboardingPage> {
     );
   }
 
-  Widget _buildPage(BuildContext context, {required IconData icon, required String title, required String description}) {
+  Widget _buildPage(
+    BuildContext context, {
+    required IconData icon,
+    required String title,
+    required String description,
+  }) {
     return Padding(
       padding: const EdgeInsets.all(32.0),
       child: Column(
@@ -145,18 +155,18 @@ class _OnboardingPageState extends State<OnboardingPage> {
           Text(
             title,
             style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontWeight: FontWeight.bold,
-                  color: Theme.of(context).colorScheme.onSurface,
-                ),
+              fontWeight: FontWeight.bold,
+              color: Theme.of(context).colorScheme.onSurface,
+            ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: 16),
           Text(
             description,
             style: Theme.of(context).textTheme.bodyLarge?.copyWith(
-                  color: Theme.of(context).colorScheme.onSurfaceVariant,
-                  height: 1.5,
-                ),
+              color: Theme.of(context).colorScheme.onSurfaceVariant,
+              height: 1.5,
+            ),
             textAlign: TextAlign.center,
           ),
         ],

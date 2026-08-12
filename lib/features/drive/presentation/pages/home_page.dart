@@ -13,7 +13,8 @@ class HomePage extends StatefulWidget {
   State<HomePage> createState() => _HomePageState();
 }
 
-class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin {
+class _HomePageState extends State<HomePage>
+    with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
   @override
@@ -45,7 +46,11 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             ),
           ),
           body: Container(
-            decoration: Theme.of(context).extension<AppThemeExtension>()?.backgroundDecoration ?? AppTheme.rcbBackgroundDecoration,
+            decoration:
+                Theme.of(
+                  context,
+                ).extension<AppThemeExtension>()?.backgroundDecoration ??
+                AppTheme.rcbBackgroundDecoration,
             child: TabBarView(
               controller: _tabController,
               children: const <Widget>[

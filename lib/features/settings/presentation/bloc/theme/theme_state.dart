@@ -10,7 +10,10 @@ class ThemeState extends Equatable {
   const ThemeState({required this.themeData, required this.themeType});
 
   factory ThemeState.initial() {
-    return ThemeState(themeData: AppTheme.rcbTheme, themeType: ThemeType.rcb);
+    return ThemeState(
+      themeData: AppTheme.fallbackTheme,
+      themeType: ThemeType.rcb,
+    );
   }
 
   @override
