@@ -2,13 +2,13 @@ import '../../../../core/usecases/usecase.dart';
 import '../entities/drive_entity.dart';
 import '../repositories/drive_repository.dart';
 
-class AddDrive implements UseCase<String, DriveEntity> {
+class UpdateDrive implements UseCase<void, DriveEntity> {
   final DriveRepository repository;
 
-  AddDrive(this.repository);
+  UpdateDrive(this.repository);
 
   @override
-  Future<String> call(DriveEntity params) async {
-    return repository.addDrive(params);
+  Future<void> call(DriveEntity params) async {
+    return repository.updateDrive(params);
   }
 }

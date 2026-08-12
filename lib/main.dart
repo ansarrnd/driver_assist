@@ -1,5 +1,4 @@
 import 'package:flutter/material.dart';
-import 'dart:io';
 import 'package:timezone/data/latest_all.dart' as tz;
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -21,12 +20,13 @@ Future<void> main() async {
   await notificationService.init();
   await notificationService.requestPermissions();
   await alarmService.init();
-  
+
   await di.init();
-  
+  await di.bootstrapData();
+
   final prefs = await SharedPreferences.getInstance();
   final hasSeenOnboarding = prefs.getBool('has_seen_onboarding') ?? false;
-  
+
   AppRouter.initialize(hasSeenOnboarding);
 
   runApp(const MyApp());
@@ -43,7 +43,7 @@ class MyApp extends StatelessWidget {
           create: (_) => di.sl<ThemeBloc>()..add(LoadThemeEvent()),
         ),
         BlocProvider<DriveBloc>(
-          create: (_) => di.sl<DriveBloc>()..add(LoadDrivesEvent()),
+          create: (_) => di.sl<DriveBloc>()..add(const LoadDrivesEvent()),
         ),
       ],
       child: BlocBuilder<ThemeBloc, ThemeState>(

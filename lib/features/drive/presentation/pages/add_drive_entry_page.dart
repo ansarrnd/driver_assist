@@ -6,9 +6,9 @@ import 'package:go_router/go_router.dart';
 
 import '../../../../core/theme/theme.dart';
 import '../../domain/entities/drive_entity.dart';
+import '../../domain/entities/drive_type.dart';
 import '../bloc/drive/drive_bloc.dart';
 import '../bloc/drive/drive_event.dart';
-import '../../../../services/alarm_service.dart';
 
 class AddDriveEntryPage extends HookWidget {
   final DriveEntity? entryToEdit;
@@ -22,18 +22,26 @@ class AddDriveEntryPage extends HookWidget {
     final customerNameController = useTextEditingController(text: entryToEdit?.customerName);
     final sourceController = useTextEditingController(text: entryToEdit?.source);
     final destinationController = useTextEditingController(text: entryToEdit?.destination);
-    
+
     final selectedDate = useState<DateTime?>(entryToEdit?.dateTime);
-    final selectedTime = useState<TimeOfDay?>(entryToEdit != null ? TimeOfDay.fromDateTime(entryToEdit!.dateTime) : null);
-    
-    final dateController = useTextEditingController(text: selectedDate.value != null ? "${selectedDate.value!.toLocal()}".split(' ')[0] : '');
-    final timeController = useTextEditingController(text: selectedTime.value != null ? selectedTime.value!.format(context) : '');
-    
-    final selectedType = useState<String>(entryToEdit?.type ?? 'trip');
-    final selectedAlarmOffset = useState<int?>(entryToEdit != null ? entryToEdit!.alarmOffsetMinutes : 1440); // 1440 = 1 day
+    final selectedTime = useState<TimeOfDay?>(
+      entryToEdit != null ? TimeOfDay.fromDateTime(entryToEdit!.dateTime) : null,
+    );
+
+    final dateController = useTextEditingController(
+      text: selectedDate.value != null ? '${selectedDate.value!.toLocal()}'.split(' ')[0] : '',
+    );
+    final timeController = useTextEditingController(
+      text: selectedTime.value != null ? selectedTime.value!.format(context) : '',
+    );
+
+    final selectedType = useState<DriveType>(entryToEdit?.type ?? DriveType.trip);
+    final selectedAlarmOffset = useState<int?>(
+      entryToEdit != null ? entryToEdit!.alarmOffsetMinutes : 1440,
+    );
 
     Future<void> selectDate(BuildContext context) async {
-      final DateTime? picked = await showDatePicker(
+      final picked = await showDatePicker(
         context: context,
         initialDate: selectedDate.value ?? DateTime.now(),
         firstDate: DateTime(2000),
@@ -41,12 +49,12 @@ class AddDriveEntryPage extends HookWidget {
       );
       if (picked != null && picked != selectedDate.value) {
         selectedDate.value = picked;
-        dateController.text = "${picked.toLocal()}".split(' ')[0];
+        dateController.text = '${picked.toLocal()}'.split(' ')[0];
       }
     }
 
     Future<void> selectTime(BuildContext context) async {
-      final TimeOfDay? picked = await showTimePicker(
+      final picked = await showTimePicker(
         context: context,
         initialTime: selectedTime.value ?? TimeOfDay.now(),
       );
@@ -56,63 +64,74 @@ class AddDriveEntryPage extends HookWidget {
       }
     }
 
-    void submitForm() async {
-      if (formKey.currentState!.validate()) {
-        if (selectedDate.value == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please select a date.')),
-          );
-          return;
-        }
-        if (selectedTime.value == null) {
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(content: Text('Please select a time.')),
-          );
-          return;
-        }
-
-        final combinedDateTime = DateTime(
-          selectedDate.value!.year,
-          selectedDate.value!.month,
-          selectedDate.value!.day,
-          selectedTime.value!.hour,
-          selectedTime.value!.minute,
-        );
-
-        final entry = DriveEntity(
-          id: entryToEdit?.id,
-          customerName: customerNameController.text,
-          dateTime: combinedDateTime,
-          source: sourceController.text,
-          destination: destinationController.text,
-          type: selectedType.value,
-          alarmOffsetMinutes: selectedAlarmOffset.value,
-        );
-
-        // Dispatches to the BLoC which saves to the local datasource
-        context.read<DriveBloc>().add(AddDriveEvent(entry));
-        
-        // Also schedule alarm
-        await alarmService.scheduleDriveAlarm(entry);
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text(isEditMode ? 'Drive entry updated successfully!' : 'Drive entry saved successfully!')),
-        );
-
-        if (isEditMode) {
-          context.pop(true);
-        } else {
-          customerNameController.clear();
-          dateController.clear();
-          timeController.clear();
-          sourceController.clear();
-          destinationController.clear();
-          selectedDate.value = null;
-          selectedTime.value = null;
-          selectedType.value = 'trip';
-        }
+    void submitForm() {
+      if (!formKey.currentState!.validate()) {
+        return;
       }
+
+      if (selectedDate.value == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a date.')),
+        );
+        return;
+      }
+
+      if (selectedTime.value == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Please select a time.')),
+        );
+        return;
+      }
+
+      final combinedDateTime = DateTime(
+        selectedDate.value!.year,
+        selectedDate.value!.month,
+        selectedDate.value!.day,
+        selectedTime.value!.hour,
+        selectedTime.value!.minute,
+      );
+
+      final entry = DriveEntity(
+        id: entryToEdit?.id,
+        customerName: customerNameController.text,
+        dateTime: combinedDateTime,
+        source: sourceController.text,
+        destination: destinationController.text,
+        type: selectedType.value,
+        alarmOffsetMinutes: selectedAlarmOffset.value,
+      );
+
+      final bloc = context.read<DriveBloc>();
+      if (isEditMode) {
+        bloc.add(UpdateDriveEvent(entry));
+      } else {
+        bloc.add(AddDriveEvent(entry));
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text(
+            isEditMode ? 'Drive entry updated successfully!' : 'Drive entry saved successfully!',
+          ),
+        ),
+      );
+
+      if (isEditMode) {
+        context.pop(true);
+        return;
+      }
+
+      customerNameController.clear();
+      dateController.clear();
+      timeController.clear();
+      sourceController.clear();
+      destinationController.clear();
+      selectedDate.value = null;
+      selectedTime.value = null;
+      selectedType.value = DriveType.trip;
     }
+
+    final isTrip = selectedType.value == DriveType.trip;
 
     final formContent = Padding(
       padding: const EdgeInsets.all(16.0),
@@ -132,26 +151,30 @@ class AddDriveEntryPage extends HookWidget {
                     Expanded(
                       child: Material(
                         type: MaterialType.transparency,
-                        child: RadioListTile<String>(
+                        child: RadioListTile<DriveType>(
                           title: const Text('Trip'),
-                          value: 'trip',
+                          value: DriveType.trip,
                           groupValue: selectedType.value,
-                          onChanged: isEditMode ? null : (String? value) {
-                            if (value != null) selectedType.value = value;
-                          },
+                          onChanged: isEditMode
+                              ? null
+                              : (value) {
+                                  if (value != null) selectedType.value = value;
+                                },
                         ),
                       ),
                     ),
                     Expanded(
                       child: Material(
                         type: MaterialType.transparency,
-                        child: RadioListTile<String>(
+                        child: RadioListTile<DriveType>(
                           title: const Text('Ticket'),
-                          value: 'ticket',
+                          value: DriveType.ticket,
                           groupValue: selectedType.value,
-                          onChanged: isEditMode ? null : (String? value) {
-                            if (value != null) selectedType.value = value;
-                          },
+                          onChanged: isEditMode
+                              ? null
+                              : (value) {
+                                  if (value != null) selectedType.value = value;
+                                },
                         ),
                       ),
                     ),
@@ -161,7 +184,8 @@ class AddDriveEntryPage extends HookWidget {
                 TextFormField(
                   controller: customerNameController,
                   decoration: const InputDecoration(labelText: 'Customer Name'),
-                  validator: (value) => value == null || value.isEmpty ? 'Please enter customer name' : null,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Please enter customer name' : null,
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
@@ -172,7 +196,8 @@ class AddDriveEntryPage extends HookWidget {
                   ),
                   readOnly: true,
                   onTap: () => selectDate(context),
-                  validator: (value) => value == null || value.isEmpty ? 'Please select a date' : null,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Please select a date' : null,
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
@@ -183,25 +208,30 @@ class AddDriveEntryPage extends HookWidget {
                   ),
                   readOnly: true,
                   onTap: () => selectTime(context),
-                  validator: (value) => value == null || value.isEmpty ? 'Please select a time' : null,
+                  validator: (value) =>
+                      value == null || value.isEmpty ? 'Please select a time' : null,
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
                   controller: sourceController,
-                  decoration: InputDecoration(labelText: selectedType.value == 'trip' ? 'Pickup' : 'Source'),
-                  validator: (value) => value == null || value.isEmpty ? 'Please enter ${selectedType.value == 'trip' ? 'pickup' : 'source'} location' : null,
+                  decoration: InputDecoration(labelText: isTrip ? 'Pickup' : 'Source'),
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Please enter ${isTrip ? 'pickup' : 'source'} location'
+                      : null,
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
                   controller: destinationController,
-                  decoration: InputDecoration(labelText: selectedType.value == 'trip' ? 'Drop' : 'Destination'),
-                  validator: (value) => value == null || value.isEmpty ? 'Please enter ${selectedType.value == 'trip' ? 'drop' : 'destination'} location' : null,
+                  decoration: InputDecoration(labelText: isTrip ? 'Drop' : 'Destination'),
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Please enter ${isTrip ? 'drop' : 'destination'} location'
+                      : null,
                 ),
                 const SizedBox(height: 16.0),
                 DropdownButtonFormField<int?>(
                   decoration: const InputDecoration(labelText: 'Set Reminder Alarm'),
                   value: selectedAlarmOffset.value,
-                  onChanged: (int? newValue) {
+                  onChanged: (newValue) {
                     selectedAlarmOffset.value = newValue;
                   },
                   items: const [
@@ -230,8 +260,8 @@ class AddDriveEntryPage extends HookWidget {
         appBar: AppBar(title: const Text('Edit Drive Entry')),
         body: formContent,
       );
-    } else {
-      return SafeArea(child: formContent);
     }
+
+    return SafeArea(child: formContent);
   }
 }

@@ -3,6 +3,7 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import '../../../../core/theme/theme.dart';
 import '../../../settings/presentation/bloc/theme/theme_bloc.dart';
 import '../../../settings/presentation/bloc/theme/theme_state.dart';
+import '../../domain/entities/drive_type.dart';
 import 'drive_schedule_screen.dart';
 
 class HomePage extends StatefulWidget {
@@ -48,8 +49,8 @@ class _HomePageState extends State<HomePage> with SingleTickerProviderStateMixin
             child: TabBarView(
               controller: _tabController,
               children: const <Widget>[
-                DriveScheduleScreen(filterType: 'trip'),
-                DriveScheduleScreen(filterType: 'ticket'),
+                DriveScheduleScreen(filterType: DriveType.trip),
+                DriveScheduleScreen(filterType: DriveType.ticket),
               ],
             ),
           ),
