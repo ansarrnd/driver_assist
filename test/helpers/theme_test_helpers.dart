@@ -5,7 +5,8 @@ import 'package:driver_schedule/features/settings/presentation/bloc/theme/theme_
 import 'package:driver_schedule/features/settings/presentation/bloc/theme/theme_event.dart';
 import 'package:driver_schedule/features/settings/presentation/bloc/theme/theme_state.dart';
 
-class MockThemeBloc extends MockBloc<ThemeEvent, ThemeState> implements ThemeBloc {}
+class MockThemeBloc extends MockBloc<ThemeEvent, ThemeState>
+    implements ThemeBloc {}
 
 ThemeState themeStateFor(ThemeType type) {
   final themeData = switch (type) {

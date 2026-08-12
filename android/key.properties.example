@@ -1,0 +1,10 @@
+# Example Android release keystore config for CI / local release builds.
+# Copy to android/key.properties and fill in real values (do NOT commit the real file).
+#
+# Or provide these as GitHub Actions secrets for the Build & Release workflow:
+#   ANDROID_KEYSTORE_BASE64, ANDROID_KEY_ALIAS, ANDROID_KEY_PASSWORD, ANDROID_STORE_PASSWORD
+
+storePassword=your-store-password
+keyPassword=your-key-password
+keyAlias=upload
+storeFile=upload-keystore.jks

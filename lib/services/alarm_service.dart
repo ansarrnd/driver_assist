@@ -58,7 +58,8 @@ class AlarmService implements AlarmScheduler {
       ),
       notificationSettings: NotificationSettings(
         title: '🚗 Time to Drive! (${entry.customerName})',
-        body: 'Upcoming trip from ${entry.source} to ${entry.destination}. Drive safely!',
+        body:
+            'Upcoming trip from ${entry.source} to ${entry.destination}. Drive safely!',
         stopButton: 'Dismiss',
       ),
     );

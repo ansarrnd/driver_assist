@@ -30,24 +30,36 @@ void main() {
     blocTest<ThemeBloc, ThemeState>(
       'loads saved theme from secure storage',
       build: () {
-        when(() => secureStorage.read(key: any(named: 'key'))).thenAnswer((_) async => 'csk');
+        when(
+          () => secureStorage.read(key: any(named: 'key')),
+        ).thenAnswer((_) async => 'csk');
         return bloc;
       },
       act: (bloc) => bloc.add(LoadThemeEvent()),
       expect: () => [
-        isA<ThemeState>().having((s) => s.themeType, 'themeType', ThemeType.csk),
+        isA<ThemeState>().having(
+          (s) => s.themeType,
+          'themeType',
+          ThemeType.csk,
+        ),
       ],
     );
 
     blocTest<ThemeBloc, ThemeState>(
       'defaults to rcb when storage is empty',
       build: () {
-        when(() => secureStorage.read(key: any(named: 'key'))).thenAnswer((_) async => null);
+        when(
+          () => secureStorage.read(key: any(named: 'key')),
+        ).thenAnswer((_) async => null);
         return bloc;
       },
       act: (bloc) => bloc.add(LoadThemeEvent()),
       expect: () => [
-        isA<ThemeState>().having((s) => s.themeType, 'themeType', ThemeType.rcb),
+        isA<ThemeState>().having(
+          (s) => s.themeType,
+          'themeType',
+          ThemeType.rcb,
+        ),
       ],
     );
 
@@ -55,7 +67,10 @@ void main() {
       'persists theme change',
       build: () {
         when(
-          () => secureStorage.write(key: any(named: 'key'), value: any(named: 'value')),
+          () => secureStorage.write(
+            key: any(named: 'key'),
+            value: any(named: 'value'),
+          ),
         ).thenAnswer((_) async {});
         return bloc;
       },
@@ -64,7 +79,9 @@ void main() {
         isA<ThemeState>().having((s) => s.themeType, 'themeType', ThemeType.mi),
       ],
       verify: (_) {
-        verify(() => secureStorage.write(key: 'selected_theme', value: 'mi')).called(1);
+        verify(
+          () => secureStorage.write(key: 'selected_theme', value: 'mi'),
+        ).called(1);
       },
     );
   });

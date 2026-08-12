@@ -33,7 +33,7 @@ class InMemoryDriveRepository implements DriveRepository {
   final FakeAlarmService alarmService;
 
   InMemoryDriveRepository({FakeAlarmService? alarmService})
-      : alarmService = alarmService ?? FakeAlarmService();
+    : alarmService = alarmService ?? FakeAlarmService();
 
   @override
   Future<String> addDrive(DriveEntity drive) async {

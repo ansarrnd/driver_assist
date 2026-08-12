@@ -23,8 +23,13 @@ class FirebaseInitializer {
     );
 
     if (endpoint != null) {
-      FirebaseFirestore.instance.useFirestoreEmulator(endpoint.host, endpoint.port);
-      debugPrint('Firestore emulator enabled at ${endpoint.host}:${endpoint.port}');
+      FirebaseFirestore.instance.useFirestoreEmulator(
+        endpoint.host,
+        endpoint.port,
+      );
+      debugPrint(
+        'Firestore emulator enabled at ${endpoint.host}:${endpoint.port}',
+      );
     }
   }
 }

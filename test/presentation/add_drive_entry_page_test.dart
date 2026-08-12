@@ -1,4 +1,3 @@
-import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 
 import 'package:driver_schedule/features/drive/presentation/pages/add_drive_entry_page.dart';
@@ -11,7 +10,9 @@ void main() {
   });
 
   group('AddDriveEntryPage', () {
-    testWidgets('shows validation errors when submitting empty form', (tester) async {
+    testWidgets('shows validation errors when submitting empty form', (
+      tester,
+    ) async {
       await pumpTestWidget(tester, const AddDriveEntryPage());
       await tester.pumpAndSettle();
 

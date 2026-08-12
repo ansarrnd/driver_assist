@@ -42,23 +42,23 @@ class AppBootstrapConfig {
     this.useFirestoreEmulator = false,
     this.firestoreEmulatorHost = 'localhost',
     this.firestoreEmulatorPort = 8080,
-  })  : initializeFirebase = false,
-        initializeNotifications = false,
-        initializeAlarms = false,
-        requestNotificationPermissions = false,
-        bootstrapData = false;
+  }) : initializeFirebase = false,
+       initializeNotifications = false,
+       initializeAlarms = false,
+       requestNotificationPermissions = false,
+       bootstrapData = false;
 
   const AppBootstrapConfig.emulator({
     this.hasSeenOnboarding = true,
     this.bootstrapData = true,
     this.firestoreEmulatorHost = 'localhost',
     this.firestoreEmulatorPort = 8080,
-  })  : initializeFirebase = true,
-        initializeNotifications = false,
-        initializeAlarms = false,
-        requestNotificationPermissions = false,
-        testDriveRepository = null,
-        useFirestoreEmulator = true;
+  }) : initializeFirebase = true,
+       initializeNotifications = false,
+       initializeAlarms = false,
+       requestNotificationPermissions = false,
+       testDriveRepository = null,
+       useFirestoreEmulator = true;
 }
 
 Future<bool> resolveOnboardingFlag(AppBootstrapConfig config) async {

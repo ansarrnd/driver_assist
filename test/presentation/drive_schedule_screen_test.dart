@@ -10,7 +10,8 @@ import 'package:driver_schedule/features/drive/presentation/pages/drive_schedule
 import '../helpers/fakes.dart';
 import '../helpers/pump_app.dart';
 
-class MockDriveBloc extends MockBloc<DriveEvent, DriveState> implements DriveBloc {}
+class MockDriveBloc extends MockBloc<DriveEvent, DriveState>
+    implements DriveBloc {}
 
 void main() {
   setUpAll(() async {
@@ -18,7 +19,9 @@ void main() {
   });
 
   group('DriveScheduleScreen', () {
-    testWidgets('shows empty state when no drives match filter', (tester) async {
+    testWidgets('shows empty state when no drives match filter', (
+      tester,
+    ) async {
       final bloc = MockDriveBloc();
       whenListen(
         bloc,

@@ -14,7 +14,10 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     on<ChangeThemeEvent>(_onChangeTheme);
   }
 
-  Future<void> _onLoadTheme(LoadThemeEvent event, Emitter<ThemeState> emit) async {
+  Future<void> _onLoadTheme(
+    LoadThemeEvent event,
+    Emitter<ThemeState> emit,
+  ) async {
     final themeString = await secureStorage.read(key: _themeKey) ?? 'rcb';
     final themeType = ThemeType.values.firstWhere(
       (e) => e.toString().split('.').last == themeString,
@@ -23,9 +26,20 @@ class ThemeBloc extends Bloc<ThemeEvent, ThemeState> {
     emit(ThemeState(themeData: _getThemeData(themeType), themeType: themeType));
   }
 
-  Future<void> _onChangeTheme(ChangeThemeEvent event, Emitter<ThemeState> emit) async {
-    await secureStorage.write(key: _themeKey, value: event.themeType.toString().split('.').last);
-    emit(ThemeState(themeData: _getThemeData(event.themeType), themeType: event.themeType));
+  Future<void> _onChangeTheme(
+    ChangeThemeEvent event,
+    Emitter<ThemeState> emit,
+  ) async {
+    await secureStorage.write(
+      key: _themeKey,
+      value: event.themeType.toString().split('.').last,
+    );
+    emit(
+      ThemeState(
+        themeData: _getThemeData(event.themeType),
+        themeType: event.themeType,
+      ),
+    );
   }
 
   ThemeData _getThemeData(ThemeType type) {

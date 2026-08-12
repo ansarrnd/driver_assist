@@ -86,7 +86,10 @@ void main() {
   group('AlarmService', () {
     test('alarmIdForEntry is stable for the same id', () {
       final service = AlarmService();
-      expect(service.alarmIdForEntry('abc123'), service.alarmIdForEntry('abc123'));
+      expect(
+        service.alarmIdForEntry('abc123'),
+        service.alarmIdForEntry('abc123'),
+      );
     });
   });
 

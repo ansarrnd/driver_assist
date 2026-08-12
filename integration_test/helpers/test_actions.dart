@@ -7,9 +7,15 @@ Future<void> fillAddDriveForm(
   required String source,
   required String destination,
 }) async {
-  await tester.enterText(find.widgetWithText(TextFormField, 'Customer Name'), customerName);
+  await tester.enterText(
+    find.widgetWithText(TextFormField, 'Customer Name'),
+    customerName,
+  );
   await tester.enterText(find.widgetWithText(TextFormField, 'Pickup'), source);
-  await tester.enterText(find.widgetWithText(TextFormField, 'Drop'), destination);
+  await tester.enterText(
+    find.widgetWithText(TextFormField, 'Drop'),
+    destination,
+  );
 
   await tester.tap(find.byIcon(Icons.calendar_today));
   await tester.pumpAndSettle();
@@ -33,7 +39,10 @@ Future<void> fillAddDriveForm(
   await tester.pumpAndSettle();
 }
 
-Future<void> swipeToDeleteEntry(WidgetTester tester, String customerName) async {
+Future<void> swipeToDeleteEntry(
+  WidgetTester tester,
+  String customerName,
+) async {
   await tester.drag(find.text(customerName), const Offset(-500, 0));
   await tester.pumpAndSettle();
   await tester.tap(find.text('Delete'));

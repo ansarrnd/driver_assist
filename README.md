@@ -103,3 +103,16 @@ Test layout:
 | `test/helpers/` | `pump_app`, fakes, and shared fixtures |
 
 Integration and widget tests use `initForTesting()` / `AppBootstrapConfig.testing()` to avoid Firebase and native alarm initialization.
+
+## CI / CD
+
+GitHub Actions run on every PR and push to `main`:
+
+- **Analyze** — format + `flutter analyze`
+- **Unit & widget tests** — coverage gate (`tool/check_coverage.sh`, min 35%)
+- **Golden tests** — snapshot baselines under `test/goldens/`
+- **Debug APK** — compile verification artifact
+
+Tag a release with `v*` (e.g. `v1.1.0`) to build release APK/AAB and create a GitHub Release.
+
+See [docs/CI_CD.md](docs/CI_CD.md) for secrets, branch protection, and recommended next inclusions (emulator tests, Codecov, iOS/Web builds, Play upload, etc.).

@@ -19,23 +19,37 @@ class AddDriveEntryPage extends HookWidget {
   Widget build(BuildContext context) {
     final isEditMode = entryToEdit != null;
     final formKey = useMemoized(() => GlobalKey<FormState>());
-    final customerNameController = useTextEditingController(text: entryToEdit?.customerName);
-    final sourceController = useTextEditingController(text: entryToEdit?.source);
-    final destinationController = useTextEditingController(text: entryToEdit?.destination);
+    final customerNameController = useTextEditingController(
+      text: entryToEdit?.customerName,
+    );
+    final sourceController = useTextEditingController(
+      text: entryToEdit?.source,
+    );
+    final destinationController = useTextEditingController(
+      text: entryToEdit?.destination,
+    );
 
     final selectedDate = useState<DateTime?>(entryToEdit?.dateTime);
     final selectedTime = useState<TimeOfDay?>(
-      entryToEdit != null ? TimeOfDay.fromDateTime(entryToEdit!.dateTime) : null,
+      entryToEdit != null
+          ? TimeOfDay.fromDateTime(entryToEdit!.dateTime)
+          : null,
     );
 
     final dateController = useTextEditingController(
-      text: selectedDate.value != null ? '${selectedDate.value!.toLocal()}'.split(' ')[0] : '',
+      text: selectedDate.value != null
+          ? '${selectedDate.value!.toLocal()}'.split(' ')[0]
+          : '',
     );
     final timeController = useTextEditingController(
-      text: selectedTime.value != null ? selectedTime.value!.format(context) : '',
+      text: selectedTime.value != null
+          ? selectedTime.value!.format(context)
+          : '',
     );
 
-    final selectedType = useState<DriveType>(entryToEdit?.type ?? DriveType.trip);
+    final selectedType = useState<DriveType>(
+      entryToEdit?.type ?? DriveType.trip,
+    );
     final selectedAlarmOffset = useState<int?>(
       entryToEdit != null ? entryToEdit!.alarmOffsetMinutes : 1440,
     );
@@ -70,16 +84,16 @@ class AddDriveEntryPage extends HookWidget {
       }
 
       if (selectedDate.value == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a date.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Please select a date.')));
         return;
       }
 
       if (selectedTime.value == null) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Please select a time.')),
-        );
+        ScaffoldMessenger.of(
+          context,
+        ).showSnackBar(const SnackBar(content: Text('Please select a time.')));
         return;
       }
 
@@ -111,7 +125,9 @@ class AddDriveEntryPage extends HookWidget {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(
           content: Text(
-            isEditMode ? 'Drive entry updated successfully!' : 'Drive entry saved successfully!',
+            isEditMode
+                ? 'Drive entry updated successfully!'
+                : 'Drive entry saved successfully!',
           ),
         ),
       );
@@ -184,8 +200,9 @@ class AddDriveEntryPage extends HookWidget {
                 TextFormField(
                   controller: customerNameController,
                   decoration: const InputDecoration(labelText: 'Customer Name'),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Please enter customer name' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Please enter customer name'
+                      : null,
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
@@ -196,8 +213,9 @@ class AddDriveEntryPage extends HookWidget {
                   ),
                   readOnly: true,
                   onTap: () => selectDate(context),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Please select a date' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Please select a date'
+                      : null,
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
@@ -208,13 +226,16 @@ class AddDriveEntryPage extends HookWidget {
                   ),
                   readOnly: true,
                   onTap: () => selectTime(context),
-                  validator: (value) =>
-                      value == null || value.isEmpty ? 'Please select a time' : null,
+                  validator: (value) => value == null || value.isEmpty
+                      ? 'Please select a time'
+                      : null,
                 ),
                 const SizedBox(height: 16.0),
                 TextFormField(
                   controller: sourceController,
-                  decoration: InputDecoration(labelText: isTrip ? 'Pickup' : 'Source'),
+                  decoration: InputDecoration(
+                    labelText: isTrip ? 'Pickup' : 'Source',
+                  ),
                   validator: (value) => value == null || value.isEmpty
                       ? 'Please enter ${isTrip ? 'pickup' : 'source'} location'
                       : null,
@@ -222,7 +243,9 @@ class AddDriveEntryPage extends HookWidget {
                 const SizedBox(height: 16.0),
                 TextFormField(
                   controller: destinationController,
-                  decoration: InputDecoration(labelText: isTrip ? 'Drop' : 'Destination'),
+                  decoration: InputDecoration(
+                    labelText: isTrip ? 'Drop' : 'Destination',
+                  ),
                   validator: (value) => value == null || value.isEmpty
                       ? 'Please enter ${isTrip ? 'drop' : 'destination'} location'
                       : null,
@@ -230,16 +253,27 @@ class AddDriveEntryPage extends HookWidget {
                 const SizedBox(height: 16.0),
                 DropdownButtonFormField<int?>(
                   isExpanded: true,
-                  decoration: const InputDecoration(labelText: 'Set Reminder Alarm'),
+                  decoration: const InputDecoration(
+                    labelText: 'Set Reminder Alarm',
+                  ),
                   value: selectedAlarmOffset.value,
                   onChanged: (newValue) {
                     selectedAlarmOffset.value = newValue;
                   },
                   items: const [
-                    DropdownMenuItem(value: null, child: Text('None (Remove Alarm)')),
+                    DropdownMenuItem(
+                      value: null,
+                      child: Text('None (Remove Alarm)'),
+                    ),
                     DropdownMenuItem(value: 0, child: Text('At time of trip')),
-                    DropdownMenuItem(value: 15, child: Text('15 minutes before')),
-                    DropdownMenuItem(value: 30, child: Text('30 minutes before')),
+                    DropdownMenuItem(
+                      value: 15,
+                      child: Text('15 minutes before'),
+                    ),
+                    DropdownMenuItem(
+                      value: 30,
+                      child: Text('30 minutes before'),
+                    ),
                     DropdownMenuItem(value: 60, child: Text('1 hour before')),
                     DropdownMenuItem(value: 1440, child: Text('1 day before')),
                   ],

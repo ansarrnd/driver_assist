@@ -27,7 +27,10 @@ void main() {
   late MockUpdateDrive updateDrive;
   late MockDeleteDrive deleteDrive;
   late DriveBloc bloc;
-  final sampleDrives = [testDrive(id: '1'), testDrive(id: '2', customerName: 'Other')];
+  final sampleDrives = [
+    testDrive(id: '1'),
+    testDrive(id: '2', customerName: 'Other'),
+  ];
 
   setUpAll(() {
     registerFallbackValue(testDrive());
@@ -57,10 +60,7 @@ void main() {
         return bloc;
       },
       act: (bloc) => bloc.add(const LoadDrivesEvent()),
-      expect: () => [
-        isA<DriveLoading>(),
-        DriveLoaded(sampleDrives),
-      ],
+      expect: () => [isA<DriveLoading>(), DriveLoaded(sampleDrives)],
     );
 
     blocTest<DriveBloc, DriveState>(
@@ -95,13 +95,17 @@ void main() {
       'delete drive triggers silent reload',
       build: () {
         when(() => deleteDrive(any())).thenAnswer((_) async {});
-        when(() => getDrives(any())).thenAnswer((_) async => [sampleDrives.first]);
+        when(
+          () => getDrives(any()),
+        ).thenAnswer((_) async => [sampleDrives.first]);
         return bloc;
       },
       seed: () => DriveLoaded(sampleDrives),
       act: (bloc) => bloc.add(const DeleteDriveEvent('1')),
       wait: const Duration(milliseconds: 50),
-      expect: () => [DriveLoaded([sampleDrives.first])],
+      expect: () => [
+        DriveLoaded([sampleDrives.first]),
+      ],
       verify: (_) {
         verify(() => deleteDrive('1')).called(1);
       },
@@ -114,10 +118,7 @@ void main() {
         return bloc;
       },
       act: (bloc) => bloc.add(const LoadDrivesEvent()),
-      expect: () => [
-        isA<DriveLoading>(),
-        isA<DriveError>(),
-      ],
+      expect: () => [isA<DriveLoading>(), isA<DriveError>()],
     );
   });
 }

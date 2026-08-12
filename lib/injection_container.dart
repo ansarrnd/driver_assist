@@ -78,7 +78,9 @@ Future<void> _registerDependencies({
   }
 
   if (firestoreDataSource != null) {
-    sl.registerLazySingleton<DriveFirestoreDataSource>(() => firestoreDataSource);
+    sl.registerLazySingleton<DriveFirestoreDataSource>(
+      () => firestoreDataSource,
+    );
   } else if (!sl.isRegistered<DriveFirestoreDataSource>()) {
     sl.registerLazySingleton<DriveFirestoreDataSource>(
       () => DriveFirestoreDataSourceImpl(sl()),
@@ -93,10 +95,7 @@ Future<void> _registerDependencies({
     sl.registerLazySingleton<DriveRepository>(() => driveRepository);
   } else {
     sl.registerLazySingleton<DriveRepository>(
-      () => DriveRepositoryImpl(
-        firestoreDataSource: sl(),
-        alarmService: sl(),
-      ),
+      () => DriveRepositoryImpl(firestoreDataSource: sl(), alarmService: sl()),
     );
   }
 

@@ -41,10 +41,7 @@ Widget buildTestApp({
 }) {
   final resolvedTheme = theme ?? testTheme();
   final body = wrapInScaffold ? Scaffold(body: child) : child;
-  final app = MaterialApp(
-    theme: resolvedTheme,
-    home: body,
-  );
+  final app = MaterialApp(theme: resolvedTheme, home: body);
 
   final providers = <BlocProvider>[
     if (themeBloc != null) BlocProvider<ThemeBloc>.value(value: themeBloc),
@@ -55,10 +52,7 @@ Widget buildTestApp({
     return app;
   }
 
-  return MultiBlocProvider(
-    providers: providers,
-    child: app,
-  );
+  return MultiBlocProvider(providers: providers, child: app);
 }
 
 Future<void> pumpTestWidget(

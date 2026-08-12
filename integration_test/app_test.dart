@@ -66,7 +66,12 @@ void main() {
         testDrive(
           id: 'seed-1',
           customerName: 'Integration User',
-          dateTime: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 12),
+          dateTime: DateTime(
+            DateTime.now().year,
+            DateTime.now().month,
+            DateTime.now().day,
+            12,
+          ),
         ),
       );
 
@@ -113,13 +118,20 @@ void main() {
       expect(find.text('Form User'), findsWidgets);
     });
 
-    testWidgets('deletes a drive entry via swipe in manage entries', (tester) async {
+    testWidgets('deletes a drive entry via swipe in manage entries', (
+      tester,
+    ) async {
       final repository = InMemoryDriveRepository();
       repository.seed(
         testDrive(
           id: 'delete-me',
           customerName: 'Delete Me',
-          dateTime: DateTime(DateTime.now().year, DateTime.now().month, DateTime.now().day, 14),
+          dateTime: DateTime(
+            DateTime.now().year,
+            DateTime.now().month,
+            DateTime.now().day,
+            14,
+          ),
         ),
       );
 

@@ -10,7 +10,8 @@ import 'package:driver_schedule/features/drive/presentation/pages/drive_schedule
 
 import '../helpers/pump_app.dart';
 
-class MockDriveBloc extends MockBloc<DriveEvent, DriveState> implements DriveBloc {}
+class MockDriveBloc extends MockBloc<DriveEvent, DriveState>
+    implements DriveBloc {}
 
 void main() {
   setUpAll(() async {
