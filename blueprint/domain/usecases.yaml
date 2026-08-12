@@ -1,0 +1,94 @@
+# Use cases
+
+```yaml
+ports:
+  DriveRepository:
+    getDrives: { returns: "Drive[]" }
+    addDrive: { params: [Drive], returns: string }      # new id
+    updateDrive: { params: [Drive], returns: void }
+    deleteDrive: { params: [string], returns: void }
+    rescheduleAllAlarms: { returns: void }
+
+  AlarmPort:
+    scheduleDriveAlarm: { params: [Drive], returns: void }
+    cancelAlarm: { params: [string], returns: void }
+    rescheduleAll: { params: ["Drive[]"], returns: void }
+
+  ThemeStore:
+    read: { returns: "ThemeId | null" }
+    write: { params: [ThemeId], returns: void }
+
+  OnboardingStore:
+    hasSeen: { returns: bool }
+    markSeen: { returns: void }
+
+use_cases:
+  GetDrives:
+    input: none
+    output: Drive[]
+    steps:
+      - call DriveRepository.getDrives  # seeds if empty inside repo/datasource
+    errors: surface as load failure to UI
+
+  AddDrive:
+    input: Drive (id usually null)
+    output: string id
+    steps:
+      - validate required fields (UI + optionally domain)
+      - id = DriveRepository.addDrive(drive)
+      - AlarmPort.scheduleDriveAlarm(drive.withId(id))
+    notes: UI should not schedule alarms itself
+
+  UpdateDrive:
+    input: Drive (id required)
+    output: void
+    steps:
+      - DriveRepository.updateDrive(drive)
+      - AlarmPort.scheduleDriveAlarm(drive)
+
+  DeleteDrive:
+    input: string id
+    output: void
+    steps:
+      - DriveRepository.deleteDrive(id)
+      - AlarmPort.cancelAlarm(id)
+
+  RescheduleAlarms:
+    input: none
+    output: void
+    steps:
+      - drives = DriveRepository.getDrives (or list without re-seed side effects if already loaded)
+      - AlarmPort.rescheduleAll(drives) / schedule each
+    when: app cold start after DI init
+
+  LoadTheme:
+    input: none
+    output: ThemeId + theme tokens
+    steps:
+      - id = ThemeStore.read() ?? rcb
+      - resolve tokens for id
+
+  ChangeTheme:
+    input: ThemeId
+    output: void
+    steps:
+      - ThemeStore.write(id)
+      - emit new theme to UI
+
+  CompleteOnboarding:
+    input: none
+    output: void
+    steps:
+      - OnboardingStore.markSeen()
+      - navigate to Schedule home
+```
+
+## UI state machine (Schedule)
+
+```text
+Initial → Loading → Loaded(drives)
+                 ↘ Error(message)
+
+Loaded + Add/Update/Delete → silent refresh → Loaded
+  (do not flash full-screen Loading if already Loaded)
+```

@@ -79,6 +79,12 @@ make ci-full                # + builds + integration if device available
 
 See [docs/LOCAL_CI.md](docs/LOCAL_CI.md) for profiles, artifacts, and prerequisites.
 
+## Portable blueprint
+
+Framework-agnostic product contract (domain, design tokens, flows, Firestore schema, platform adapters, QA) for reimplementing this app on another stack:
+
+→ **[blueprint/00-overview.md](blueprint/00-overview.md)** · [docs index](docs/README.md)
+
 ## Architecture
 
 Clean architecture with BLoC:

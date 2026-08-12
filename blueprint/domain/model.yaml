@@ -1,0 +1,57 @@
+# Domain model
+
+```yaml
+enums:
+  DriveType:
+    values: [trip, ticket]
+    default: trip
+    parse_unknown_as: trip
+
+  DriveSchedulePeriod:
+    values: [today, week, month]
+    default: month
+    labels:
+      today: Today
+      week: Week
+      month: Month
+
+  ThemeId:
+    values: [rcb, csk, mi, kkr, dc, rr, pbks, srh, lsg, gt]
+    default: rcb
+
+entities:
+  Drive:
+    id:
+      type: string
+      optional: true
+      notes: Assigned by persistence layer (Firestore document id)
+    customerName:
+      type: string
+      required: true
+    source:
+      type: string
+      required: true
+      ui_label:
+        trip: Pickup
+        ticket: Source
+    destination:
+      type: string
+      required: true
+      ui_label:
+        trip: Drop
+        ticket: Destination
+    dateTime:
+      type: datetime
+      required: true
+      storage: ISO-8601 string
+    type:
+      type: DriveType
+      required: true
+      default: trip
+    alarmOffsetMinutes:
+      type: int
+      optional: true
+      notes: null means no alarm; 0 means at trip time
+
+value_objects: []
+```

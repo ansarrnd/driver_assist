@@ -1,0 +1,131 @@
+# Design tokens
+
+```yaml
+meta:
+  color_mode: dark
+  material_version: "3-like semantic roles"
+  typography_family: Outfit   # geometric sans; fallback system sans OK
+
+shared:
+  glass:
+    blur: 15
+    opacity: 0.1
+    border_radius: 10
+  button_radius: 8
+  input_radius: 8
+  input_fill_opacity: 0.1
+  nav:
+    elevation: 10
+    unselected_opacity: 0.7
+
+layout:
+  root_navigation: bottom_tabs
+  tabs:
+    - id: schedule
+      label: Schedule
+      icon: drive / car
+    - id: add
+      label: Add
+      icon: add_circle_outline
+    - id: settings
+      label: Settings
+      icon: settings
+  schedule_subtabs: [Trips, Tickets]
+  schedule_period_filter:
+    default: Month
+    options: [Today, Week, Month]
+
+components:
+  glass_card:
+    usage: schedule list rows, add form shell, settings rows
+    interaction: tap to edit; swipe-end-to-start to delete (manage screen)
+  empty_state:
+    icon: directions_car_outlined (schedule) / inbox (manage)
+    title: "No drive schedules available." # schedule
+  theme_chip:
+    shape: pill / rounded 16
+    shows: color dot + team code
+    selected: border + tinted fill in team color
+
+themes:
+  rcb:
+    label: RCB
+    seed: "#E50E2F"
+    secondary: "#D4AF37"
+    background: "#1A1A1A"
+    app_bar_text: "#D4AF37"
+    button_text: "#FFFFFF"
+    gradient: ["#1A1A1A", "#8B0000"]
+  csk:
+    label: CSK
+    seed: "#FCCA00"
+    secondary: "#FF8200"
+    background: "#003B7A"
+    app_bar_text: "#FFFFFF"
+    button_text: "#003B7A"
+    gradient: ["#003B7A", "#FCCA00"]
+  mi:
+    label: MI
+    seed: "#004BA0"
+    secondary: "#D4AF37"
+    background: "#004BA0"
+    app_bar_text: "#D4AF37"
+    button_text: "#D4AF37"
+    gradient: ["#004BA0", "#D4AF37"]
+  kkr:
+    label: KKR
+    seed: "#3A225D"
+    secondary: "#B3A123"
+    background: "#1E1332"
+    app_bar_text: "#B3A123"
+    button_text: "#B3A123"
+    gradient: ["#1E1332", "#B3A123"]
+  dc:
+    label: DC
+    seed: "#00008B"
+    secondary: "#EF1A2D"
+    background: "#000040"
+    app_bar_text: "#EF1A2D"
+    button_text: "#FFFFFF"
+    gradient: ["#000040", "#EF1A2D"]
+  rr:
+    label: RR
+    seed: "#EA1A85"
+    secondary: "#001D48"
+    background: "#8A0F4D"
+    app_bar_text: "#FFFFFF"
+    button_text: "#FFFFFF"
+    gradient: ["#8A0F4D", "#001D48"]
+  pbks:
+    label: PBKS
+    seed: "#D71920"
+    secondary: "#D4AF37"
+    background: "#7A0E12"
+    app_bar_text: "#D4AF37"
+    button_text: "#FFFFFF"
+    gradient: ["#7A0E12", "#D4AF37"]
+  srh:
+    label: SRH
+    seed: "#F26522"
+    secondary: "#F26522"
+    background: "#111111"
+    app_bar_text: "#FFFFFF"
+    button_text: "#FFFFFF"
+    gradient: ["#000000", "#F26522"]
+  lsg:
+    label: LSG
+    seed: "#00B1E5"
+    secondary: "#00B1E5"
+    background: "#00223E"
+    app_bar_text: "#FFFFFF"
+    button_text: "#FFFFFF"
+    gradient: ["#005792", "#00B1E5"]
+  gt:
+    label: GT
+    seed: "#0B172A"
+    secondary: "#B19D5E"
+    background: "#060D18"
+    app_bar_text: "#B19D5E"
+    button_text: "#B19D5E"
+    gradient: ["#060D18", "#B19D5E"]
+```
