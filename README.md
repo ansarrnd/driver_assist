@@ -41,11 +41,24 @@ Mock seed data lives in `assets/mock/firestore_drive_entries.json` and is writte
 
 ### Local development with emulator
 
-Uncomment the emulator line in `lib/core/firebase/firebase_initializer.dart` and run:
+Start the Firestore emulator:
 
 ```bash
 firebase emulators:start --only firestore
 ```
+
+Run the app against the emulator:
+
+```bash
+# Option 1: environment variable (recommended)
+export FIRESTORE_EMULATOR_HOST=localhost:8080
+flutter run
+
+# Option 2: bootstrap config
+# Use AppBootstrapConfig.emulator() in a custom entrypoint
+```
+
+`firebase.json` is included with Firestore on port `8080`.
 
 ## Getting started
 
@@ -68,8 +81,8 @@ Alarm scheduling is handled in the repository layer (not the UI), including resc
 ## Testing
 
 ```bash
-# Unit + widget tests
-flutter test --exclude-tags golden
+# Unit + widget tests with coverage gate (default 35%)
+bash tool/check_coverage.sh
 
 # Golden/snapshot tests (baselines committed under test/goldens/)
 flutter test test/goldens

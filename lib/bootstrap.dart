@@ -19,6 +19,9 @@ class AppBootstrapConfig {
   final bool bootstrapData;
   final bool? hasSeenOnboarding;
   final DriveRepository? testDriveRepository;
+  final bool useFirestoreEmulator;
+  final String firestoreEmulatorHost;
+  final int firestoreEmulatorPort;
 
   const AppBootstrapConfig({
     this.initializeFirebase = true,
@@ -28,16 +31,34 @@ class AppBootstrapConfig {
     this.bootstrapData = true,
     this.hasSeenOnboarding,
     this.testDriveRepository,
+    this.useFirestoreEmulator = false,
+    this.firestoreEmulatorHost = 'localhost',
+    this.firestoreEmulatorPort = 8080,
   });
 
   const AppBootstrapConfig.testing({
     this.hasSeenOnboarding = true,
     this.testDriveRepository,
+    this.useFirestoreEmulator = false,
+    this.firestoreEmulatorHost = 'localhost',
+    this.firestoreEmulatorPort = 8080,
   })  : initializeFirebase = false,
         initializeNotifications = false,
         initializeAlarms = false,
         requestNotificationPermissions = false,
         bootstrapData = false;
+
+  const AppBootstrapConfig.emulator({
+    this.hasSeenOnboarding = true,
+    this.bootstrapData = true,
+    this.firestoreEmulatorHost = 'localhost',
+    this.firestoreEmulatorPort = 8080,
+  })  : initializeFirebase = true,
+        initializeNotifications = false,
+        initializeAlarms = false,
+        requestNotificationPermissions = false,
+        testDriveRepository = null,
+        useFirestoreEmulator = true;
 }
 
 Future<bool> resolveOnboardingFlag(AppBootstrapConfig config) async {
@@ -65,7 +86,11 @@ Future<void> bootstrapApp(AppBootstrapConfig config) async {
   }
 
   if (config.initializeFirebase) {
-    await di.init();
+    await di.init(
+      useFirestoreEmulator: config.useFirestoreEmulator,
+      firestoreEmulatorHost: config.firestoreEmulatorHost,
+      firestoreEmulatorPort: config.firestoreEmulatorPort,
+    );
     if (config.bootstrapData) {
       await di.bootstrapData();
     }
