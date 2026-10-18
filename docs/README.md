@@ -5,6 +5,7 @@
 | [README.md](../README.md) | Getting started, Firebase, architecture overview |
 | [CI_CD.md](CI_CD.md) | GitHub Actions, secrets, release flow |
 | [LOCAL_CI.md](LOCAL_CI.md) | Enterprise local CI (`tool/ci_local.sh`) |
+| [React Native concepts](react-native-concepts.md) | React Native concepts explained with equivalent examples from this Flutter app |
 | [Portable blueprint](../blueprint/00-overview.md) | Framework-agnostic product contract for reimplementation |
 
 ## Blueprint map
